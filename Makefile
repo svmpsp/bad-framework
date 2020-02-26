@@ -2,13 +2,14 @@
 
 PYTHON_VERSION ?= 3.6.9
 VENV_DIR ?= venv-bad-framework
+INSTALL_DIR ?= test_install
 PACKAGE_NAME ?= bad_framework
 
 # If --python is not specified virtualenv uses the /usr/bin/python interpreter
 PYTHON ?= $(shell which python3)
 BUILD_PYTHON ?= $(VENV_DIR)/bin/python3
 
-.PHONY: clean package push test
+.PHONY: clean package push push-test test
 
 all: package
 
@@ -35,6 +36,12 @@ package: test $(VENV_DIR)/bin/activate
 	source $(VENV_DIR)/bin/activate && $(BUILD_PYTHON) setup.py sdist bdist_wheel
 	@echo ">>> Done."
 
+install-test: $(VENV_DIR)/bin/activate
+	@echo ">>> Creating test installation..."
+	source $(VENV_DIR)/bin/activate && test -d $(INSTALL_DIR) || mkdir $(INSTALL_DIR) && cd $(INSTALL_DIR) \
+        && bad init && bash
+	@echo ">>> Done."
+
 push-test: dist package $(VENV_DIR)/bin/activate
 	@echo ">>> Pushing to Test PyPI..."
 	source $(VENV_DIR)/bin/activate && twine check dist/* && twine upload --repository testpypi dist/*
@@ -50,6 +57,7 @@ clean:
 	rm -rf ./*~
 	rm -rf .python-version
 	rm -rf $(VENV_DIR)
+	rm -rf $(INSTALL_DIR)
 	rm -rf build
 	rm -rf $(PACKAGE_NAME).egg-info
 	rm -rf dist
