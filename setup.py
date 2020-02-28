@@ -12,7 +12,7 @@ print('Install requirements is', install_requirements)
     
 setup(
     name='bad-framework',
-    version='0.0.4',
+    version='0.0.5',
     author='Sivam Pasupathipillai',
     author_email='s.pasupathipillai@unitn.it',
     description='Benchmarking Anomaly Detection (BAD) framework.',
