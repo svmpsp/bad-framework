@@ -1,13 +1,11 @@
-# bad-framework: research framework for Benchmarking Anomaly Detection (BAD)
+# BAD: a research framework for Benchmarking Anomaly Detection
 The BAD framework (**bad_framework**) is a distributed benchmarking framework for benchmarking unsupervised anomaly detection algorithms.
 
 ## SECURITY DISCLAIMER
-BAD is a research prototype and is not meant to run on production systems.
-
-BAD is **INSECURE by DESIGN** as it enables malicious users to run arbitrary code on the host running the BAD master (localhost by default).
+BAD is a research prototype and is not meant to run on production systems. BAD is **INSECURE by DESIGN** as it enables malicious users to run arbitrary code on the host running the BAD master (localhost by default).
 
 **DO NOT** run 
-> $ bad start-server
+> $ bad server-start
 
 on hosts exposed to public networks, or on production critical systems.
 
@@ -15,31 +13,27 @@ on hosts exposed to public networks, or on production critical systems.
 We recommend installing BAD inside a virtualenv.
 
 To create and activate the virtualenv run:
+> $ virtualenv --python=python3 .bad_venv
 
-> $ virtualenv --python=python3 bad-venv
-
-To activate the virtualenv run
-
-> $ source venv_bad/bin/activate
+To activate the virtualenv run:
+> $ source .bad_venv/bin/activate
 
 Then, install BAD inside the virtualenv using pip with:
-
-> pip install bad-framework
+> $ pip install bad-framework
 
 To check if BAD is installed run:
+> $ bad -h
 
-> bad -h
-
-This should print the command usage.
+which should print the command usage.
 
 ## Usage
 BAD requires a set of some configuration files in order to run correctly.
 
-BAD can create a default configuration with
+You can create a default configuration with:
+> $ bad init
 
-> bad init
-
-This command overwrites previous configuration files in the current directory, to avoid naming collision and data losses, we recommend moving to and empty directory before running **init**
+**WARNING:** the **bad init** command overwrites previous configuration files in the current directory.
+ To avoid naming collision and data losses, we recommend moving to and empty directory before running **bad init**
 
 Create a new directory with:
 > $ mkdir bad-installation && cd bad-installation
@@ -55,7 +49,6 @@ Your current directory should now contain the following files.
 - candidates/ 
 
 To start the BAD framework run:
-
 > $ bad server-start
 
 By default, this starts the BAD master on **localhost** at port **3290**.
@@ -74,9 +67,7 @@ You can run an example experiment with:
 By default, experiment results are saved to the **bad_dump.csv** file in the current directory.
 
 Once you are done, you can stop the BAD framework with:
-
 > $ bad server-stop
-
 
 Copyright (c) 2020 Sivam Pasupathipillai <s.pasupathipillai@unitn.it>.
 
