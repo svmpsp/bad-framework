@@ -29,7 +29,7 @@ $(VENV_DIR)/bin/activate: requirements.txt .python-version
 docs: $(VENV_DIR)/bin/activate
 	@echo ">>> Creating project documentation..."
 	source $(VENV_DIR)/bin/activate && $(MAKE) -C docsrc html
-	cp -a _build/html/. ./docs
+	cp -a ./docsrc/_build/html/. ./docs
 	@echo "<<< Done"
 
 test: setup.py $(VENV_DIR)/bin/activate
