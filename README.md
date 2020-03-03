@@ -1,6 +1,8 @@
 # BAD: a research framework for Benchmarking Anomaly Detection
 The BAD framework (**bad_framework**) is a distributed benchmarking framework for benchmarking unsupervised anomaly detection algorithms.
 
+Please refer to the [official documentation](https://www.youtube.com/watch?v=oHg5SJYRHA0) for details.
+
 ## SECURITY DISCLAIMER
 BAD is a research prototype and is not meant to run on production systems. BAD is **INSECURE by DESIGN** as it enables malicious users to run arbitrary code on the host running the BAD master (localhost by default).
 
@@ -33,7 +35,7 @@ You can create a default configuration with:
 > $ bad init
 
 **WARNING:** the **bad init** command overwrites previous configuration files in the current directory.
- To avoid naming collision and data losses, we recommend moving to and empty directory before running **bad init**
+ To avoid naming collision and data losses, we recommend moving to an empty directory before running **bad init**
 
 Create a new directory with:
 > $ mkdir bad-installation && cd bad-installation
@@ -42,11 +44,11 @@ Then initialize the BAD framework with:
 > $ bad init
 
 Your current directory should now contain the following files.
-- conf/default.conf
-- conf/workers
-- candidate_parameters.txt
-- candidate_requirements.txt
-- candidates/ 
+- **conf/default.conf -** default configuration settings.
+- **conf/workers -** worker specification file.
+- **candidate_parameters.txt -** Candidate hyperparameter file.
+- **candidate_requirements.txt -** Candidate requirements file.
+- **candidates/** - Candidate directory. It contains Candidate implementations
 
 To start the BAD framework run:
 > $ bad server-start
