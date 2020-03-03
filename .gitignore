@@ -1,8 +1,8 @@
 .idea
 .python-version
 __pycache__
-bad_master.egg-info
+bad_framework.egg-info
 build
 dist
-docs/_build
-venv-bad-master
+docsrc/_build
+venv-bad-framework

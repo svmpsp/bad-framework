@@ -37,7 +37,7 @@ test: setup.py $(VENV_DIR)/bin/activate
 	source $(VENV_DIR)/bin/activate && $(BUILD_PYTHON) -m unittest -v --catch --failfast --locals
 	@echo ">>> Done."
 
-package: test $(VENV_DIR)/bin/activate
+package: docs test $(VENV_DIR)/bin/activate
 	@echo ">>> Packaging BAD client..."
 	source $(VENV_DIR)/bin/activate && $(BUILD_PYTHON) setup.py sdist bdist_wheel
 	@echo ">>> Done."
