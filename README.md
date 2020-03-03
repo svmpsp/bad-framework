@@ -1,7 +1,7 @@
 # BAD: a research framework for Benchmarking Anomaly Detection
 The BAD framework (**bad_framework**) is a distributed benchmarking framework for unsupervised anomaly detection algorithms.
 
-Please refer to the [official documentation](https://www.youtube.com/watch?v=oHg5SJYRHA0) for details.
+Please refer to the [official documentation](https://passiv-me.github.io/bad-framework/) for details.
 
 ## SECURITY DISCLAIMER
 BAD is a research prototype and is not meant to run on production systems. BAD is **INSECURE by DESIGN** as it enables malicious users to run arbitrary code on the host running the BAD master (localhost by default).
