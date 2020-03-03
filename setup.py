@@ -1,4 +1,5 @@
 from setuptools import setup, find_packages
+import bad_framework
 
 with open('README.md', 'r') as fh:
     long_description = fh.read()
@@ -7,7 +8,7 @@ install_requirements = ['bad-client']
 
 setup(
     name='bad-framework',
-    version='0.0.5',
+    version=bad_framework.__version__,
     author='Sivam Pasupathipillai',
     author_email='s.pasupathipillai@unitn.it',
     description='Benchmarking Anomaly Detection (BAD) framework.',

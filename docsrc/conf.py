@@ -16,13 +16,14 @@
 
 
 # -- Project information -----------------------------------------------------
+import bad_framework
 
 project = 'BAD'
-copyright = '2019, Sivam Pasupathipillai'
+copyright = '2020, Sivam Pasupathipillai'
 author = 'Sivam Pasupathipillai'
 
 # The full version, including alpha/beta/rc tags
-release = '0.1.0'
+release = bad_framework.__version__
 
 
 # -- General configuration ---------------------------------------------------
@@ -53,3 +54,6 @@ html_theme = 'alabaster'
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+# Do not copy .rst files into build directory.
+html_copy_source = False
