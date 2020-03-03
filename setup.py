@@ -1,15 +1,10 @@
 from setuptools import setup, find_packages
 
-with open('requirements.txt', 'r') as reqs_file:
-    install_requirements = []
-    for line in reqs_file:
-        install_requirements.append(line.strip())
-
 with open('README.md', 'r') as fh:
     long_description = fh.read()
 
-print('Install requirements is', install_requirements)
-    
+install_requirements = ['bad-client']
+
 setup(
     name='bad-framework',
     version='0.0.5',

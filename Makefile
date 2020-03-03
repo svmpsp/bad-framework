@@ -9,7 +9,7 @@ PACKAGE_NAME ?= bad_framework
 PYTHON ?= $(shell which python3)
 BUILD_PYTHON ?= $(VENV_DIR)/bin/python3
 
-.PHONY: clean package push push-test test
+.PHONY: clean docs package push push-test test
 
 all: package
 
@@ -26,6 +26,11 @@ $(VENV_DIR)/bin/activate: requirements.txt .python-version
 		$(BUILD_PYTHON) -m pip install -r requirements.txt
 	@echo ">>> Done."
 
+docs: $(VENV_DIR)/bin/activate
+	@echo ">>> Creating project documentation..."
+	source $(VENV_DIR)/bin/activate && $(MAKE) -C docs html
+	@echo "<<< Done"
+
 test: setup.py $(VENV_DIR)/bin/activate
 	@echo ">>> Running tests..."
 	source $(VENV_DIR)/bin/activate && $(BUILD_PYTHON) -m unittest -v --catch --failfast --locals
@@ -38,7 +43,7 @@ package: test $(VENV_DIR)/bin/activate
 
 install-test: $(VENV_DIR)/bin/activate
 	@echo ">>> Creating test installation..."
-	source $(VENV_DIR)/bin/activate && test -d $(INSTALL_DIR) || mkdir $(INSTALL_DIR) && cd $(INSTALL_DIR) \
+	source $(VENV_DIR)/bin/activate && pip install --no-cache-dir -e ../bad-client && test -d $(INSTALL_DIR) || mkdir $(INSTALL_DIR) && cd $(INSTALL_DIR) \
         && bad init && bash
 	@echo ">>> Done."
 
