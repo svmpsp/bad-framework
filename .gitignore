@@ -4,4 +4,5 @@ __pycache__
 bad_master.egg-info
 build
 dist
+docs/_build
 venv-bad-master
