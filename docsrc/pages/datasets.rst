@@ -1,9 +1,9 @@
 .. _pages/datasets:
 
-BAD data sets
-=============
+Data sets
+=========
 
-BAD includes the following benchmark data sets.
+BAD includes a collection of anomaly detection benchmark data sets.
 
 All data sets are composed of numerical features only. All data sets are without duplicates.
 
@@ -19,3 +19,32 @@ All data sets are composed of numerical features only. All data sets are without
  wbc           377      30            Breast cancer screening `(source) <http://odds.cs.stonybrook.edu/wbc/>`_
  wine          129      13            Wine chemical analysis `(source) <http://odds.cs.stonybrook.edu/wine/>`_
 ============  =======  ============  =============================================================================================================================
+
+Contributing benchmarks
+-----------------------
+If you want to contribute a benchmark data set to BAD it is important to do the following.
+
+Your benchmark must be formatted in ARFF_. All data must be included into a single *.arff* file.
+
+The first two attributes in the file must be named **id** and **outlier** where
+
+- **id -** an integer identifier for the data element (starting from 0).
+- **outlier -** represents the data element label, with outliers labeled as 1.0 and inliers labeled as 0.0.
+
+All other attributes in the data set must be **real-valued**.
+
+For example, you could contribute the file **my_data.arff** with the following content:
+
+.. code-block:: bash
+
+   @RELATION 'My custom dataset'
+
+   @ATTRIBUTE 'id' integer
+   @ATTRIBUTE 'outlier' real
+   @ATTRIBUTE 'att1' real
+   @ATTRIBUTE 'att2' real
+   ...
+
+See :ref:`Contributing to BAD <pages/contributions>` for more information.
+
+.. _ARFF: https://www.cs.waikato.ac.nz/ml/weka/arff.html

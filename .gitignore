@@ -6,3 +6,4 @@ build
 dist
 docsrc/_build
 venv-bad-framework
+*~

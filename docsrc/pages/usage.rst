@@ -1,24 +1,16 @@
 .. _pages/usage:
    
-BAD command line interface (CLI)
-================================
+Usage
+=====
 
 .. code-block:: bash
 
    usage: bad [-h] [-c BAD.CANDIDATE] [-q BAD.CANDIDATE.REQUIREMENTS]
               [-p BAD.CANDIDATE.PARAMETERS] [-d BAD.DATA] [-o BAD.DUMP.FILE]
               [-D BAD.CONFIGURATION] [-l BAD.LOG.LEVEL]
-              [command]
+              [init | server-start | server-stop]
 
 The BAD CLI is the main client provided with the BAD framework. It enables users to control BAD processes and run experiments on the framework.
-
-For instance, in order to start BAD server processes one can run the command
-
-.. code-block:: bash
-
-   bad server-start
-
-from the BAD home directory.
 
 Basic commands
 --------------
@@ -27,14 +19,14 @@ Commands are used to manage the BAD framework, all available commands are descri
 ================  ================================================================================================================================
  Command           Description
 ================  ================================================================================================================================
- server-start      Starts BAD server processes. By default reads configuration from BAD_HOME/conf/bad-defaults.conf and BAD_HOME/conf/workers
- server-stop       Stops BAD server processes. By default reads configuration from BAD_HOME/conf/bad-defaults.conf and BAD_HOME/conf/workers
- server-restart    Stops then restarts BAD server processes. By default reads configuration from BAD_HOME/conf/bad-defaults.conf and BAD_HOME/conf/workers
+ init              Initializes BAD configuration files in current directory
+ server-start      Starts BAD server processes. By default reads configuration from conf/bad-defaults.conf and conf/workers
+ server-stop       Stops BAD server processes. By default reads configuration from conf/bad-defaults.conf and conf/workers
 ================  ================================================================================================================================
 
 Execution
 ---------
-Once the server processes are running, experiments can be executed with the following command
+Once the server processes are running, experiments can be executed with the following command:
 
 .. code-block:: bash
 
