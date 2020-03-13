@@ -36,6 +36,7 @@ All other attributes in the data set must be **real-valued**.
 For example, you could contribute the file **my_data.arff** with the following content:
 
 .. code-block:: bash
+   :caption: my_data.arff
 
    @RELATION 'My custom dataset'
 

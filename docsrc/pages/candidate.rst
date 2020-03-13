@@ -1,19 +1,21 @@
 .. _pages/candidate:
    
-The Candidate API
-=================
+Algorithms
+==========
 
-A Candidate is the abstraction representing an unsupervised anomaly detection algorithm in the BAD framework.
+A Candidate is the abstraction representing an unsupervised anomaly
+detection algorithm in the BAD framework.
 
-In practice, a Candidate is a python module implementing an anomaly detection technique.
+In practice, a Candidate is a python module implementing an anomaly
+detection technique.
 
 The Candidate API defines the characteristics of a Candidate module.
-
 
 The score method
 ----------------
 
-The main requirement of a Candidate is that it must implement the **score** method, with the following signature:
+A Candidate must implement the **score** method, with the following
+signature:
 
 .. code-block:: python
 
@@ -23,12 +25,19 @@ The main requirement of a Candidate is that it must implement the **score** meth
 
        return score_matrix
 
-The **data_matrix** parameter represents the data set to be analyzed. It is represented as a 2-dimensional `numpy array <https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html>`_ of float of dimensions *N X D*.
+The **data_matrix** parameter represents the data set to be
+analyzed. It is represented as a 2-dimensional `numpy array
+<https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html>`_
+of float with shape *N X D*.
 
-The **score_matrix** variable represents the output of the algorithm. It should be a 2-dimensional `numpy array <https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html>`_ of float of dimension *N X (D+1)*.
-The last column should correspond to the score for each element.
+The **score_matrix** variable represents the output of the
+algorithm. It should be a 2-dimensional `numpy array
+<https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html>`_
+of float with shape *N X (D+1)*.  The additional column corresponds to
+the score for each element.
 
-For instance, when analyzing a data set with 100 data elements and 4 dimensions, BAD will enforce that:
+As an example, when analyzing a data set with 100 data elements and 4
+dimensions, BAD will enforce that:
 
 .. code-block:: python
 
@@ -42,20 +51,29 @@ While the Candidate code must enforce that:
    >>> score_matrix.shape
    (100, 5)
 
-First class definition
-----------------------
-The **score** method must be implemented as a class method. The class implementing the **score** method is called the *Candidate class*.
+Candidate class definition
+--------------------------
 
-The Candidate class must be the first class defined in the candidate module. The name of the Candidate class is parsed and used by the BAD framework as an identifier.
+The **score** method must be implemented as part of a class. The class
+implementing the **score** method is called the *Candidate class*.
 
-There is no limit on the number of classes that can be defined in the Candidate module, however the first class defined in the module must fulfill the requirements of the Candidate class.
+The Candidate class must be the **first class** (in order) defined in
+the candidate module. The name of the Candidate class is used by the
+BAD framework as an identifier.
+
+There is no limit on the number of classes that can be defined in the
+Candidate module, however the first class found in the module must
+represent a Candidate, i.e. it must implement the score method.
 
 Candidate initialization
 ------------------------
 
-Candidate initialization is performed using the **__init__()** method of the Candidate class. 
+Candidate initialization is performed using the **__init__()** method
+of the Candidate class.
 
-To support the :ref:`BAD parameters API <pages/parameters>`, the Candidate **__init__()** method must be implemented with the following signature.
+To support the :ref:`BAD parameters API <pages/parameters>`, the
+Candidate **__init__()** method must be implemented with the following
+signature.
 
 .. code-block:: python
 
@@ -63,7 +81,15 @@ To support the :ref:`BAD parameters API <pages/parameters>`, the Candidate **__i
    
        # Extract parameters from kwargs ...
 
-The keys in the **kwargs** dict will match the keys defined in the *candidate_parameters.txt* file. For more details, see :ref:`hyper-parameter tuning <pages/parameters>`.
+The keys in the **kwargs** dict will match the keys defined in the
+*candidate_parameters.txt* file. For more details, see
+:ref:`hyper-parameter tuning <pages/parameters>`.
 
-The special key *seed* is always provided by the framework to be used as an RNG seed for replicable experiments. You can override the seed in the Candidate parameters file.
+The special key *seed* is always provided by the framework to be used
+as an RNG seed for replicable experiments. You can override the seed
+in the Candidate parameters file.
 
+Contributing Candidates
+-----------------------
+
+TODO

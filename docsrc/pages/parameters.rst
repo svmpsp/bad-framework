@@ -23,9 +23,9 @@ As an example, the following is a valid Candidate parameter file:
    :linenos:
 
    # BAD candidate parameters file (this is a comment)
-   x                  10
-   y                  10   100  10
-   z                  1.0  2.0  0.1
+   x   10
+   y   10   100  10
+   z   1.0  2.0  0.1
    # ... this is another comment
    database_endpoint  http://mydb.url/instance1234 
 
