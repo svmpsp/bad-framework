@@ -5,10 +5,10 @@ Usage
 
 .. code-block:: bash
 
-   usage: bad [-h] [-c BAD.CANDIDATE] [-q BAD.CANDIDATE.REQUIREMENTS]
-              [-p BAD.CANDIDATE.PARAMETERS] [-d BAD.DATA] [-o BAD.DUMP.FILE]
-              [-D BAD.CONFIGURATION] [-l BAD.LOG.LEVEL]
-              [init | server-start | server-stop]
+   usage: bad [-h] [-c BAD.CANDIDATE] [-d BAD.DATA] [-o BAD.DUMP.FILE]
+              [-p BAD.CANDIDATE.PARAMETERS] [-q BAD.CANDIDATE.REQUIREMENTS] [-v]
+	      [{init,server-start,server-stop}]
+
 
 The BAD CLI is the main client provided with the BAD framework. It enables users to control BAD processes and run experiments on the framework.
 
