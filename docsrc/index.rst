@@ -7,10 +7,11 @@ Welcome to BAD: Benchmarking for Anomaly Detection!
 ===================================================
 
 .. warning::
-   **BAD** is **insecure** by design.
+   The **BAD framework** lets users execute **arbitrary code** on the server machine.
 
-   **Do not deploy** in production critical systems or on open networks.
-   Security features might be added in future releases.
+   **DO NOT** deploy on production critical systems or open networks.
+   Security features might be added in later releases.
+
 
 BAD is a benchmarking framework for unsupervised anomaly detection
 algorithms.
