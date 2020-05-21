@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Suite detail for {{ candidate.suite }}</title>
+    <style>
+        .status_created {
+            color: grey;
+        }
+        .status_scheduled {
+            color: black;
+        }
+        .status_running {
+            color: blue;
+        }
+        .status_completed {
+            color: green;
+        }
+        .status_failed {
+            color: red;
+        }
+    </style>
+
+</head>
+<body>
+<h2>Suite {{ candidate.suite }}</h2>
+{% if experiments %}
+    <ul>
+        {% for experiment in experiments %}
+            <li>
+                <span class="status_{{ experiment.get_status_string() }}">[Status: {{ experiment.get_status_string() }}]</span> - <b>{{ candidate.name }}</b> on <b>{{ experiment.dataset }}</b> (<a href="/experiment/{{ experiment.id }}/">details</a>)
+                <ul>
+                    <li>Parameters: {{ experiment.parameters }}</li>
+                </ul>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No experiments defined.</p>
+{% endif %}
+</body>
+</html>

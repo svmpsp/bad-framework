@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Experiment detail for {{ experiment.id }}</title>
+</head>
+<body>
+<h2>Experiment {{ experiment.id }}</h2>
+<ul>
+    <li>Scheduled: {{ experiment.scheduled_ts }}</li>
+    <li>Completed: {{ experiment.completed_ts }}</li>
+    <li>Candidate: {{ candidate.name }} ({{ experiment.parameters }})</li>
+    <li>Dataset: {{ experiment.dataset }}</li>
+</ul>
+{% if experiment.get_status_string() == 'completed' %}
+<h2>Results</h2>
+<ul>
+    <li>Metrics: <a href="/experiment/{{ experiment.id }}/metrics.json">metrics.json</a></li>
+    <li>ROC: <a href="/experiment/{{ experiment.id }}/roc.png">roc.png</a></li>
+</ul>
+{% endif %}
+
+</body>
+</html>

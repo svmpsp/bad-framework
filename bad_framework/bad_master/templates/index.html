@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en-US">
+    <head>
+        <meta charset="UTF-8">
+        <title>BAD - Home</title>
+    </head>
+    <body>
+        <h2>BAD - Benchmarking for Anomaly Detection</h2>
+    {% if suites %}
+        <ul>
+            {% for suite in suites %}
+                <li>
+                    <a href="/suite/{{ suite.id }}/">Suite {{ suite.id }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No suites defined.</p>
+    {% endif %}
+    </body>
+</html>

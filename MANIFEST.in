@@ -1,0 +1,3 @@
+graft bad_framework/include
+graft bad_framework/bad_master/templates
+graft bad_framework/bad_worker/templates

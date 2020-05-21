@@ -1,74 +1,73 @@
 #!/usr/bin/env make
 
-PYTHON_VERSION ?= 3.6.9
-VENV_DIR ?= venv-bad-framework
-INSTALL_DIR ?= test_install
+PYTHON_VERSION ?= 3.7.5
 PACKAGE_NAME ?= bad_framework
+VENV_NAME := $(PACKAGE_NAME)-$(PYTHON_VERSION)
+INSTALL_DIR ?= install
 
-# If --python is not specified virtualenv uses the /usr/bin/python interpreter
-PYTHON ?= $(shell which python3)
-BUILD_PYTHON ?= $(VENV_DIR)/bin/python3
-
-.PHONY: clean docs package push push-test test
+.PHONY: clean package push-test push test venv
 
 all: package
 
 .python-version:
 	@echo ">>> Setting project Python version..."
-	pyenv local $(PYTHON_VERSION)
-	@echo ">>> Done."
+	pyenv virtualenv $(PYTHON_VERSION) $(VENV_NAME)
+	pyenv local $(VENV_NAME)
+	@echo "<<< Done."
 
-$(VENV_DIR)/bin/activate: requirements.txt .python-version
-	@echo ">>> Creating virtual environment..."
-	virtualenv --python=$(PYTHON) $(VENV_DIR)
-	source $(VENV_DIR)/bin/activate && \
-		$(BUILD_PYTHON) -m pip install --upgrade pip && \
-		$(BUILD_PYTHON) -m pip install -r requirements.txt
-	@echo ">>> Done."
+venv: .python-version requirements.txt
+	@echo ">>> Updating venv dependencies..."
+	pip install -U pip
+	pip install -r requirements.txt
+	pip install -e .
+	@echo "<<< Done."
 
-docs: $(VENV_DIR)/bin/activate
+docs: .python-version venv
 	@echo ">>> Creating project documentation..."
-	source $(VENV_DIR)/bin/activate && $(MAKE) -C docsrc html
+	$(MAKE) -C docsrc html
 	cp -a ./docsrc/_build/html/. ./docs
 	@echo "<<< Done"
 
-test: setup.py $(VENV_DIR)/bin/activate
+test: setup.py venv
 	@echo ">>> Running tests..."
-	source $(VENV_DIR)/bin/activate && $(BUILD_PYTHON) -m unittest -v --catch --failfast --locals
-	@echo ">>> Done."
+	python3 -m unittest -v --catch --failfast --locals
+	@echo "<<< Done."
 
-package: docs test $(VENV_DIR)/bin/activate
+package: docs venv test
 	@echo ">>> Packaging BAD client..."
-	source $(VENV_DIR)/bin/activate && $(BUILD_PYTHON) setup.py sdist bdist_wheel
-	@echo ">>> Done."
+	python3 setup.py sdist bdist_wheel
+	@echo "<<< Done."
 
-install-test: $(VENV_DIR)/bin/activate
-	@echo ">>> Creating test installation..."
-	source $(VENV_DIR)/bin/activate && pip install --no-cache-dir -e ../bad-client && test -d $(INSTALL_DIR) || mkdir $(INSTALL_DIR) && cd $(INSTALL_DIR) \
-        && bad init && bash
-	@echo ">>> Done."
+install: package
+	@echo ">>> Creating installation directory..."
+	pip install -e .
+	[[ -d $(INSTALL_DIR) ]] || mkdir $(INSTALL_DIR)
+	@echo ">>> Starting debug session..."
+	@cd $(INSTALL_DIR) && bash
+	rm -rf $(INSTALL_DIR)
+	@echo "<<< Done."
 
-push-test: dist package $(VENV_DIR)/bin/activate
+push-test: dist package
 	@echo ">>> Pushing to Test PyPI..."
-	source $(VENV_DIR)/bin/activate && twine check dist/* && twine upload --repository testpypi dist/*
-	@echo ">>> Done."
+	twine check dist/* && twine upload --repository testpypi dist/*
+	@echo "<<< Done."
 
-push: dist package $(VENV_DIR)/bin/activate
+push: dist package
 	@echo ">>> Pushing to PyPI..."
-	source $(VENV_DIR)/bin/activate && twine check dist/* && twine upload dist/*
-	@echo ">>> Done."
+	twine check dist/* && twine upload dist/*
+	@echo "<<< Done."
 
 clean:
 	@echo ">>> Cleaning project directory..."
 	rm -rf ./*~
 	rm -rf .python-version
-	rm -rf $(VENV_DIR)
+	pyenv uninstall -f $(VENV_NAME)
 	rm -rf $(INSTALL_DIR)
 	rm -rf build
 	rm -rf docsrc/_build
 	rm -rf $(PACKAGE_NAME).egg-info
 	rm -rf dist
-	@echo ">>> Done."
+	@echo "<<< Done."
 
 # Disable Makefile update via implicit rules
 Makefile: ;
