@@ -77,14 +77,16 @@ push: .pypi_report
 ### - clean: cleans project directory.
 clean:
 	@echo ">>> Cleaning project directory..."
-	rm -rf ./*~
-	rm -rf .python-version
-	pyenv uninstall -f $(VENV_NAME)
-	rm -rf $(INSTALL_DIR)
-	rm -rf build
-	rm -rf docsrc/_build
-	rm -rf $(PACKAGE_NAME).egg-info
-	rm -rf dist
+	-rm -rf ./*~
+	-rm -rf .python-version
+	-rm -rf .pytest_report
+	-rm -rf .pypi_report
+	-pyenv uninstall -f $(VENV_NAME)
+	-rm -rf $(INSTALL_DIR)
+	-rm -rf build
+	-rm -rf docsrc/_build
+	-rm -rf $(PACKAGE_NAME).egg-info
+	-rm -rf dist
 	@echo "<<< Done."
 
 ### - help: displays this message.
