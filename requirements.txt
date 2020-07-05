@@ -1,3 +1,4 @@
 black
 sphinx
+sphinx-rtd-theme
 wheel
