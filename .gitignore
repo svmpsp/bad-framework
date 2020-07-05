@@ -1,5 +1,7 @@
 .idea
 .python-version
+.pytest_report
+.pypi_report
 __pycache__
 bad_framework.egg-info
 build

@@ -3,54 +3,55 @@
 PYTHON_VERSION ?= 3.7.5
 PACKAGE_NAME ?= bad_framework
 VENV_NAME := $(PACKAGE_NAME)-$(PYTHON_VERSION)
+
 SRC_DIR ?= bad_framework
 TEST_DIR ?= tests
 INSTALL_DIR ?= install
 
-.PHONY: clean help package push-test push test venv
+SOURCES ?= $(shell find $(PACKAGE_NAME))
+TEST_SOURCES ?= $(shell find tests)
+DOC_SOURCES ?= $(shell find docsrc)
+
+.PHONY: clean help
 
 all: package
 
-.python-version:
-	@echo ">>> Setting project Python version..."
+### - venv: creates the virtualenvironment for the project.
+venv: .python-version
+.python-version: requirements.txt setup.py
+	@echo ">>> Creating project development venv..."
+	-pyenv uninstall -f $(VENV_NAME)
 	pyenv virtualenv $(PYTHON_VERSION) $(VENV_NAME)
 	pyenv local $(VENV_NAME)
-	@echo "<<< Done."
-
-### - help: displays this message.
-help:
-	@echo "This project's Makefile supports the following targets:"
-	@grep '[#]##' Makefile | sed 's/[#]##//g'
-
-### - venv: creates the virtualenvironment for the project.
-venv: .python-version requirements.txt
-	@echo ">>> Updating venv dependencies..."
 	pip install -U pip
 	pip install -r requirements.txt
 	pip install -e .
 	@echo "<<< Done."
 
 ### - docs: builds the documentation.
-docs: .python-version venv
+docs: $(DOC_SOURCES) .python-version
 	@echo ">>> Creating project documentation..."
 	$(MAKE) -C docsrc html
 	cp -a ./docsrc/_build/html/. ./docs
 	@echo "<<< Done"
 
 ### - test: runs unit and integration tests.
-test: setup.py venv
+test: pytest_report
+.pytest_report: $(TEST_SOURCES) $(SOURCES) .python-version
 	@echo ">>> Running tests..."
-	pytest && touch pytest_report
+	-rm .pytest_report
+	pytest && (echo "All is well!" > .pytest_report)
 	@echo "<<< Done."
 
 ### - package: packages the project for distribution via PyPI.
-package: docs venv test
+package: dist
+dist: .python-version .pytest_report docs
 	@echo ">>> Packaging BAD client..."
 	python3 setup.py sdist bdist_wheel
 	@echo "<<< Done."
 
-### - install: creates a test installation for debugging purposes.
-install: package
+### - debug: creates a test installation for debugging purposes.
+debug: $(SRC_DIR) .pytest_report
 	@echo ">>> Creating installation directory..."
 	pip install -e .
 	[[ -d $(INSTALL_DIR) ]] || mkdir $(INSTALL_DIR)
@@ -60,13 +61,15 @@ install: package
 	@echo "<<< Done."
 
 ### - push-test: pushes the package to Test PyPI.
-push-test: dist package
+push-test: .pypi_report
+.pypi_report: .python-version .pytest_report dist
 	@echo ">>> Pushing to Test PyPI..."
-	twine check dist/* && twine upload --repository testpypi dist/*
+	-rm ./.pipy_report
+	twine check dist/* && twine upload --repository testpypi dist/* && (echo "Push test was good!" > .pypi_report)
 	@echo "<<< Done."
 
 ### - push: pushes the package to PyPI.
-push: dist package
+push: .pypi_report
 	@echo ">>> Pushing to PyPI..."
 	twine check dist/* && twine upload dist/*
 	@echo "<<< Done."
@@ -83,6 +86,11 @@ clean:
 	rm -rf $(PACKAGE_NAME).egg-info
 	rm -rf dist
 	@echo "<<< Done."
+
+### - help: displays this message.
+help:
+	@echo "This project's Makefile supports the following targets:"
+	@grep '[#]##' Makefile | sed 's/[#]##//g'
 
 # Disable Makefile update via implicit rules
 Makefile: ;

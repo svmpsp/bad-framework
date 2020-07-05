@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Data sets &mdash; BAD 1.2.3 documentation</title>
+  <title>Datasets &mdash; BAD 1.2.3 documentation</title>
   
 
   
@@ -86,7 +86,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Data sets</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Datasets</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#contributing-benchmarks">Contributing benchmarks</a></li>
 </ul>
 </li>
@@ -140,7 +140,7 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>Data sets</li>
+      <li>Datasets</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -157,10 +157,10 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="data-sets">
-<span id="pages-datasets"></span><h1>Data sets<a class="headerlink" href="#data-sets" title="Permalink to this headline">¶</a></h1>
-<p>BAD includes a collection of anomaly detection benchmark data sets.</p>
-<p>All data sets are composed of numerical features only. All data sets are without duplicates.</p>
+  <div class="section" id="datasets">
+<span id="pages-datasets"></span><h1>Datasets<a class="headerlink" href="#datasets" title="Permalink to this headline">¶</a></h1>
+<p>BAD includes a collection of anomaly detection benchmark datasets.</p>
+<p>All data sets are composed of numerical features only. All datasets are without duplicates.</p>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 8%" />
@@ -220,17 +220,21 @@
 </table>
 <div class="section" id="contributing-benchmarks">
 <h2>Contributing benchmarks<a class="headerlink" href="#contributing-benchmarks" title="Permalink to this headline">¶</a></h2>
-<p>If you want to contribute a benchmark data set to BAD it is important to do the following.</p>
-<p>Your benchmark must be formatted in <a class="reference external" href="https://www.cs.waikato.ac.nz/ml/weka/arff.html">ARFF</a>. All data must be included into a single <em>.arff</em> file.</p>
-<p>The first two attributes in the file must be named <strong>id</strong> and <strong>outlier</strong> where</p>
+<p>If you want to contribute a benchmark dataset to BAD, please ensure the following:</p>
+<ol class="arabic simple">
+<li><p>your benchmark is formatted in <a class="reference external" href="https://www.cs.waikato.ac.nz/ml/weka/arff.html">ARFF</a>. All data must be included into a single <em>.arff</em> file.</p></li>
+<li><p>the first two attributes in the file must be named <strong>id</strong> and <strong>outlier</strong>, where:</p></li>
+</ol>
 <ul class="simple">
 <li><p><strong>id -</strong> an integer identifier for the data element (starting from 0).</p></li>
 <li><p><strong>outlier -</strong> represents the data element label, with outliers labeled as 1.0 and inliers labeled as 0.0.</p></li>
 </ul>
-<p>All other attributes in the data set must be <strong>real-valued</strong>.</p>
+<ol class="arabic simple" start="3">
+<li><p>All other attributes in the dataset must be <strong>real-valued</strong>.</p></li>
+</ol>
 <p>For example, you could contribute the file <strong>my_data.arff</strong> with the following content:</p>
 <div class="literal-block-wrapper docutils container" id="id1">
-<div class="code-block-caption"><span class="caption-text">my_data.arff</span><a class="headerlink" href="#id1" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-text">Contents of my_data.arff</span><a class="headerlink" href="#id1" title="Permalink to this code">¶</a></div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>@RELATION <span class="s1">&#39;My custom dataset&#39;</span>
 
 @ATTRIBUTE <span class="s1">&#39;id&#39;</span> integer

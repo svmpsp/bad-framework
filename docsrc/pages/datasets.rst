@@ -1,11 +1,11 @@
 .. _pages/datasets:
 
-Data sets
-=========
+Datasets
+========
 
-BAD includes a collection of anomaly detection benchmark data sets.
+BAD includes a collection of anomaly detection benchmark datasets.
 
-All data sets are composed of numerical features only. All data sets are without duplicates.
+All data sets are composed of numerical features only. All datasets are without duplicates.
 
 ============  =======  ============  =============================================================================================================================
  Name          Size     Dimensions    Description
@@ -22,21 +22,20 @@ All data sets are composed of numerical features only. All data sets are without
 
 Contributing benchmarks
 -----------------------
-If you want to contribute a benchmark data set to BAD it is important to do the following.
+If you want to contribute a benchmark dataset to BAD, please ensure the following:
 
-Your benchmark must be formatted in ARFF_. All data must be included into a single *.arff* file.
-
-The first two attributes in the file must be named **id** and **outlier** where
+1. your benchmark is formatted in ARFF_. All data must be included into a single *.arff* file.
+2. the first two attributes in the file must be named **id** and **outlier**, where:
 
 - **id -** an integer identifier for the data element (starting from 0).
 - **outlier -** represents the data element label, with outliers labeled as 1.0 and inliers labeled as 0.0.
 
-All other attributes in the data set must be **real-valued**.
+3. All other attributes in the dataset must be **real-valued**.
 
 For example, you could contribute the file **my_data.arff** with the following content:
 
 .. code-block:: bash
-   :caption: my_data.arff
+   :caption: Contents of my_data.arff
 
    @RELATION 'My custom dataset'
 
