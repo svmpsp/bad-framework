@@ -42,7 +42,7 @@ def get_candidate_file_paths(home_dir, suite_id):
     }
 
 
-def load_parameters(parameter_file, seed):
+def load_parameters(parameter_file, suite):
     """Loads the parameter dictionary from a parameter file.
 
     The parameter file contains one parameter per line. Each parameter can be either a value parameter
@@ -57,7 +57,7 @@ def load_parameters(parameter_file, seed):
     NOTE: if the range cannot be divided into an integer number of steps the behavior is undefined.
 
     :param parameter_file: (string) path to parameter file.
-    :param seed: (int) default RNG seed.
+    :param suite: (models.Suite) contains default values for required parameters.
     :return: (dict) parameter dictionary
     """
     parameters = {}
@@ -93,8 +93,11 @@ def load_parameters(parameter_file, seed):
                             param_line=line
                         )
                     )
+    # Add default values for required parameters
     if "seed" not in parameters:
-        parameters["seed"] = ValueParameter(value=seed)
+        parameters["seed"] = ValueParameter(value=suite.seed)
+    if "trainset_size" not in parameters:
+        parameters["trainset_size"] = ValueParameter(value=suite.trainset_size)
     return parameters
 
 

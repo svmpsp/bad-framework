@@ -31,7 +31,8 @@ def start_bad_worker(hostname, port, debug=False):
         "port": port,
     }
     subprocess.call(
-        ["{flag} source {script} {hostname} {port} > /dev/null".format(**params)], shell=True,
+        ["{flag} source {script} {hostname} {port} > /dev/null".format(**params)],
+        shell=True,
     )
 
 

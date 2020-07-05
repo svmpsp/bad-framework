@@ -7,7 +7,7 @@ import tornado.web
 
 from .views import (
     CandidateHandler,
-    DataHandler,
+    DatasetHandler,
     ExperimentHandler,
     IndexHandler,
     ResultHandler,
@@ -45,7 +45,7 @@ class BADMasterServer:
                     r"^/candidate/(?P<candidate_id>[a-z0-9-]+)/requirements/$",
                     CandidateHandler,
                 ),
-                (r"^/data/(?P<dataset_name>[a-z0-9-]+)/$", DataHandler),
+                (r"^/dataset/(?P<dataset_name>[a-z0-9-]+)/$", DatasetHandler),
                 (r"^/experiment/(?P<experiment_id>[a-z0-9-]+)/$", ExperimentHandler),
                 (
                     r"^/experiment/(?P<experiment_id>[a-z0-9-]+)/results/$",
@@ -59,7 +59,10 @@ class BADMasterServer:
                 (r"^/suite/$", SuiteHandler),
                 (r"^/suite/(?P<suite_id>[a-z0-9-]+)/$", SuiteHandler),
                 (r"^/suite/(?P<suite_id>[a-z0-9-]+)/dump/$", SuiteDumpHandler),
-                (r"^/suite/(?P<suite_id>[a-z0-9-]+)/experiments/$", SuiteExperimentsHandler),
+                (
+                    r"^/suite/(?P<suite_id>[a-z0-9-]+)/experiments/$",
+                    SuiteExperimentsHandler,
+                ),
             ],
             debug=options.debug,
             master_home=home_dir,
@@ -81,9 +84,7 @@ def main():
     for k, v in options.items():
         log.info("  %s = %r", k, v)
 
-    bad_master = BADMasterServer(
-        options.master_port, options.master_home
-    )
+    bad_master = BADMasterServer(options.master_port, options.master_home)
     bad_master.start()
 
 

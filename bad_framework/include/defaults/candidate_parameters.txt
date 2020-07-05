@@ -1,4 +1,6 @@
 #
 # BAD candidate parameters file
 #
-k  10
+k              10  100  10
+trainset_size  0.2  1.0  0.2
+seed           42

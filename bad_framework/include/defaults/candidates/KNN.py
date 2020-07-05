@@ -27,5 +27,10 @@ class KNN:
     def score(self, element):
         if not self._model:
             raise ValueError("invalid state. The model has not been trained.")
-        point_distances, _ = self._model.kneighbors(element)
-        return point_distances[-1]
+
+        element = element.reshape(1, -1)  # element has 1D, kneighbors() requires 2D
+        neighbor_distances, _ = self._model.kneighbors(
+            element
+        )  # neighbor_distances has shape (1, k)
+        knn_distance = neighbor_distances[0][-1]
+        return knn_distance

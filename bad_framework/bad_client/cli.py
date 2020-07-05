@@ -8,7 +8,7 @@ from bad_framework.bad_worker import start_bad_worker, stop_bad_worker
 from bad_framework.bad_utils.files import delete_bad_files
 from bad_framework.bad_utils.network import HTTPSessionManager
 
-from .monitor import SuiteMonitor
+from .monitor import monitor_suite
 from .settings import *
 
 log = logging.getLogger("bad.client")
@@ -34,7 +34,7 @@ def generate_suite_settings(config):
         "data": config["bad.data"],
         "workers": workers,
         "seed": int(config["bad.experiment.seed"]),
-        "parallelization": int(config["bad.experiment.parallelization"]),
+        "trainset_size": float(config["bad.experiment.trainset_size"]),
     }
 
 
@@ -71,7 +71,9 @@ def _create_suite(config):
     files = {
         "suite_settings": encoded_settings,
         "candidate_source": open(config[BAD_CANDIDATE_KEY], "rb").read(),
-        "candidate_requirements": open(config[BAD_CANDIDATE_REQUIREMENTS_KEY], "rb").read(),
+        "candidate_requirements": open(
+            config[BAD_CANDIDATE_REQUIREMENTS_KEY], "rb"
+        ).read(),
         "candidate_parameters": open(config[BAD_CANDIDATE_PARAMETERS_KEY], "rb").read(),
     }
     suite_submit_url = BAD_MASTER_SUITE_SUBMIT_URL
@@ -85,14 +87,15 @@ def _create_suite(config):
 
 
 def _run_bad_suite(config):
+
     suite_id = _create_suite(config)
+
     master_address = "{master_ip}:{master_port}".format(
         master_ip=config["bad.master"], master_port=config["bad.master.port"]
     )
     master_session = HTTPSessionManager(master_address)
     start_time = datetime.datetime.now()
-    monitor = SuiteMonitor(master_session=master_session, suite_id=suite_id)
-    monitor.start()
+    monitor_suite(master_session=master_session, suite_id=suite_id)
     suite_execution_time = (datetime.datetime.now() - start_time).total_seconds()
     log.info("BAD execution completed in %f seconds.", suite_execution_time)
     download_dump_file(config, suite_id)

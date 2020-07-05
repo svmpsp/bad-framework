@@ -53,6 +53,7 @@ class Candidate(Model):
             if candidate.suite == suite_id:
                 return candidate
 
+
 class Dataset(Model):
 
     _objects = {}
@@ -117,13 +118,8 @@ class Experiment(Model):
 
     def load_metrics(self):
         if self.metrics:
-            with open(self.metrics, 'r') as metrics_file:
-                return dict(
-                    [
-                        (metric["name"], metric["value"])
-                        for metric in json.load(metrics_file)["metrics"]
-                    ]
-                )
+            with open(self.metrics, "r") as metrics_file:
+                return json.load(metrics_file)
         else:
             ValueError("metrics file not found.")
 
@@ -149,13 +145,14 @@ class Suite(Model):
 
     _objects = {}
 
-    def __init__(self, seed):
+    def __init__(self, seed, trainset_size):
         self.id = self._get_id("suite")
         self.seed = seed
+        self.trainset_size = trainset_size
 
     @classmethod
-    def create(cls, seed):
-        new_suite = Suite(seed)
+    def create(cls, seed, trainset_size):
+        new_suite = Suite(seed, trainset_size)
         cls._objects[new_suite.id] = new_suite
         return new_suite
 

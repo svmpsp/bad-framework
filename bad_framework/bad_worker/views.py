@@ -56,18 +56,12 @@ class SetupHandler(BaseWorkerHandler):
     async def _setup_worker(self):
         log.info(">>> Setting up worker")
         message = json.loads(self.request.body)
-
-        log.info("Message is: %s", message)
-
         master_address = message["master_address"]
         candidate_id = message["candidate_id"]
         suite_id = message["suite_id"]
         datasets = message["datasets"]
         base_path = self.get_wd()
         master_session = AsyncHTTPSessionManager(master_address)
-
-        log.info("Master session is: %r", master_session)
-
         await self._download_candidate_files(
             master_session, candidate_id, suite_id, base_path
         )
@@ -118,12 +112,12 @@ class SetupHandler(BaseWorkerHandler):
         :return: None
         """
         log.info("Downloading datasets: %r", datasets)
-
         data_urls = [
-            "data/{dataset_name}/".format(dataset_name=dataset) for dataset in datasets
+            "dataset/{dataset_name}/".format(dataset_name=dataset)
+            for dataset in datasets
         ]
         data_paths = [
-            "{base_path}/data/{dataset_name}.arff".format(
+            "{base_path}/dataset/{dataset_name}.arff".format(
                 base_path=base_path, dataset_name=dataset
             )
             for dataset in datasets
@@ -153,11 +147,14 @@ class RunHandler(BaseWorkerHandler):
         self._home_dir = self.get_wd()
         self._master_address = message["master_address"]
         self._master_session = AsyncHTTPSessionManager(self._master_address)
-        self._parameters = message["parameters"]
         self._suite_id = message["suite_id"]
+        self._parameters = load_parameter_string(message["parameters"])
+        self._trainset_size = self._parameters["trainset_size"]
 
     async def _update_experiment_status(self, status):
-        experiment_url = "experiment/{experiment_id}/".format(experiment_id=self._experiment_id)
+        experiment_url = "experiment/{experiment_id}/".format(
+            experiment_id=self._experiment_id
+        )
         message = {"status": status}
         await self._master_session.post_json(url=experiment_url, data=message)
 
@@ -180,23 +177,29 @@ class RunHandler(BaseWorkerHandler):
         roc_auc = roc_auc_score(y_score=scores, y_true=labels)
         average_precision = average_precision_score(y_score=scores, y_true=labels)
 
-        log.debug("ROC AUC is %f", roc_auc)
         metrics = {
             "experiment_id": self._experiment_id,
-            "metrics": [
-                {"name": "roc_auc", "value": roc_auc},
-                {"name": "average_precision", "value": average_precision},
-            ],
+            "roc_auc": roc_auc,
+            "average_precision": average_precision,
         }
         pretty_json = json.dumps(metrics, indent=2)
         with open(metrics_path, "w") as metrics_file:
             metrics_file.write(pretty_json)
         return metrics_path
 
-    @classmethod
-    def _generate_scores(cls, candidate, data_matrix):
+    def _generate_scores(
+        self, candidate, data_matrix,
+    ):
         feature_matrix = data_matrix[:, 2:]
-        candidate = candidate.fit(feature_matrix)
+
+        # Subsample feature matrix to obtain training set
+        np.random.seed(int(self._parameters["seed"]))
+        num_rows = feature_matrix.shape[0]
+        trainset_size = int(num_rows * float(self._parameters["trainset_size"]))
+        training_indexes = np.random.choice(num_rows, size=trainset_size, replace=False)
+        training_matrix = feature_matrix[training_indexes, :]
+
+        candidate = candidate.fit(training_matrix)
         scores = np.apply_along_axis(candidate.score, axis=1, arr=feature_matrix)
         return scores
 
@@ -218,6 +221,7 @@ class RunHandler(BaseWorkerHandler):
         plt.title("ROC")
         plt.plot(fpr, tpr, color="blue", lw=2)
         plt.savefig(roc_path, format="png")
+        plt.close()
         return roc_path
 
     async def _send_results(
@@ -242,15 +246,11 @@ class RunHandler(BaseWorkerHandler):
             self._experiment_id,
             self._master_address,
         )
-        log.info("Candidate parameters are: %s", self._parameters)
-
-        candidate_parameters = load_parameter_string(self._parameters)
-
         home_dir = self.get_wd()
         candidate_path = "{home_dir}/{suite_id}/candidate.py".format(
             home_dir=home_dir, suite_id=self._suite_id
         )
-        data_path = "{home_dir}/data/{data_name}.arff".format(
+        data_path = "{home_dir}/dataset/{data_name}.arff".format(
             home_dir=home_dir, data_name=self._data_name,
         )
         candidate_name = get_candidate_name(candidate_path)
@@ -258,7 +258,7 @@ class RunHandler(BaseWorkerHandler):
         log.info("Loading candidate %s from candidate module...", candidate_name)
         bad_candidate = self._import_candidate_module(candidate_path)
         candidate_class = getattr(bad_candidate, candidate_name)
-        candidate = candidate_class(**candidate_parameters)
+        candidate = candidate_class(**self._parameters)
 
         try:
             log.info(">>> Running experiment %s", self._experiment_id)
