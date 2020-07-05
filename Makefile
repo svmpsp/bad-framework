@@ -7,7 +7,7 @@ SRC_DIR ?= bad_framework
 TEST_DIR ?= tests
 INSTALL_DIR ?= install
 
-.PHONY: clean package push-test push
+.PHONY: clean help package push-test push test venv
 
 all: package
 
@@ -17,30 +17,39 @@ all: package
 	pyenv local $(VENV_NAME)
 	@echo "<<< Done."
 
-$(VENV_NAME)/bin/activate: .python-version requirements.txt
+### - help: displays this message.
+help:
+	@echo "This project's Makefile supports the following targets:"
+	@grep '[#]##' Makefile | sed 's/[#]##//g'
+
+### - venv: creates the virtualenvironment for the project.
+venv: .python-version requirements.txt
 	@echo ">>> Updating venv dependencies..."
 	pip install -U pip
 	pip install -r requirements.txt
 	pip install -e .
 	@echo "<<< Done."
 
-docs: .python-version $(VENV_NAME)/bin/activate
+### - docs: builds the documentation.
+docs: .python-version venv
 	@echo ">>> Creating project documentation..."
 	$(MAKE) -C docsrc html
 	cp -a ./docsrc/_build/html/. ./docs
 	@echo "<<< Done"
 
-test: pytest_report $(VENV_NAME)/bin/activate
-pytest_report: $(SRC_DIR) $(TEST_DIR)
+### - test: runs unit and integration tests.
+test: setup.py venv
 	@echo ">>> Running tests..."
 	pytest && touch pytest_report
 	@echo "<<< Done."
 
-package: docs pytest_report $(VENV_NAME)/bin/activate
+### - package: packages the project for distribution via PyPI.
+package: docs venv test
 	@echo ">>> Packaging BAD client..."
 	python3 setup.py sdist bdist_wheel
 	@echo "<<< Done."
 
+### - install: creates a test installation for debugging purposes.
 install: package
 	@echo ">>> Creating installation directory..."
 	pip install -e .
@@ -50,16 +59,19 @@ install: package
 	rm -rf $(INSTALL_DIR)
 	@echo "<<< Done."
 
+### - push-test: pushes the package to Test PyPI.
 push-test: dist package
 	@echo ">>> Pushing to Test PyPI..."
 	twine check dist/* && twine upload --repository testpypi dist/*
 	@echo "<<< Done."
 
+### - push: pushes the package to PyPI.
 push: dist package
 	@echo ">>> Pushing to PyPI..."
 	twine check dist/* && twine upload dist/*
 	@echo "<<< Done."
 
+### - clean: cleans project directory.
 clean:
 	@echo ">>> Cleaning project directory..."
 	rm -rf ./*~

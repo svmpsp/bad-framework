@@ -1,4 +1,5 @@
 black
-sphinx
-wheel
 pytest
+sphinx
+sphinx-rtd-theme
+wheel
