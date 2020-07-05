@@ -31,7 +31,7 @@ def generate_suite_settings(config):
         "master_address": "{master_host}:{master_port}".format(
             master_host=config["bad.master.ip"], master_port=config["bad.master.port"]
         ),
-        "data": config["bad.data"],
+        "data": config["bad.data"],  # TODO: add support for local files
         "workers": workers,
         "seed": int(config["bad.experiment.seed"]),
         "trainset_size": float(config["bad.experiment.trainset_size"]),
@@ -59,6 +59,13 @@ def download_dump_file(config, suite_id):
 
 
 def _create_suite(config):
+    """
+    TODO:
+     - add support for uploading local .arff files
+
+    :param config:
+    :return:
+    """
     log.info(">>> Generating experiment suite - BAD master at %s", config["bad.master"])
 
     master_hostname = "{0}:{1}".format(config["bad.master"], config["bad.master.port"],)
@@ -94,9 +101,11 @@ def _run_bad_suite(config):
         master_ip=config["bad.master"], master_port=config["bad.master.port"]
     )
     master_session = HTTPSessionManager(master_address)
+
     start_time = datetime.datetime.now()
     monitor_suite(master_session=master_session, suite_id=suite_id)
     suite_execution_time = (datetime.datetime.now() - start_time).total_seconds()
+
     log.info("BAD execution completed in %f seconds.", suite_execution_time)
     download_dump_file(config, suite_id)
 
