@@ -1,0 +1,292 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Algorithms &mdash; BAD 1.2.3 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Hyper-parameter tuning" href="parameters.html" />
+    <link rel="prev" title="Data sets" href="datasets.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> BAD
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datasets.html">Data sets</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Algorithms</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#the-score-method">The score method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#candidate-class-definition">Candidate class definition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#candidate-initialization">Candidate initialization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#contributing-candidates">Contributing Candidates</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="parameters.html">Hyper-parameter tuning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="execution.html">BAD execution model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributions.html">Contributing to BAD</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">BAD</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Algorithms</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="algorithms">
+<span id="pages-candidate"></span><h1>Algorithms<a class="headerlink" href="#algorithms" title="Permalink to this headline">¶</a></h1>
+<p>A Candidate is the abstraction representing an unsupervised anomaly
+detection algorithm in the BAD framework.</p>
+<p>In practice, a Candidate is a python module implementing an anomaly
+detection technique.</p>
+<p>The Candidate API defines the characteristics of a Candidate module.</p>
+<div class="section" id="the-score-method">
+<h2>The score method<a class="headerlink" href="#the-score-method" title="Permalink to this headline">¶</a></h2>
+<p>A Candidate must implement the <strong>score</strong> method, with the following
+signature:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_matrix</span><span class="p">):</span>
+
+    <span class="c1"># Compute outlier scores ...</span>
+
+    <span class="k">return</span> <span class="n">score_matrix</span>
+</pre></div>
+</div>
+<p>The <strong>data_matrix</strong> parameter represents the data set to be
+analyzed. It is represented as a 2-dimensional <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html">numpy array</a>
+of float with shape <em>N X D</em>.</p>
+<p>The <strong>score_matrix</strong> variable represents the output of the
+algorithm. It should be a 2-dimensional <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html">numpy array</a>
+of float with shape <em>N X (D+1)</em>.  The additional column corresponds to
+the score for each element.</p>
+<p>As an example, when analyzing a data set with 100 data elements and 4
+dimensions, BAD will enforce that:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data_matrix</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(100, 4)</span>
+</pre></div>
+</div>
+<p>While the Candidate code must enforce that:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">score_matrix</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(100, 5)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="candidate-class-definition">
+<h2>Candidate class definition<a class="headerlink" href="#candidate-class-definition" title="Permalink to this headline">¶</a></h2>
+<p>The <strong>score</strong> method must be implemented as part of a class. The class
+implementing the <strong>score</strong> method is called the <em>Candidate class</em>.</p>
+<p>The Candidate class must be the <strong>first class</strong> (in order) defined in
+the candidate module. The name of the Candidate class is used by the
+BAD framework as an identifier.</p>
+<p>There is no limit on the number of classes that can be defined in the
+Candidate module, however the first class found in the module must
+represent a Candidate, i.e. it must implement the score method.</p>
+</div>
+<div class="section" id="candidate-initialization">
+<h2>Candidate initialization<a class="headerlink" href="#candidate-initialization" title="Permalink to this headline">¶</a></h2>
+<p>Candidate initialization is performed using the <strong>__init__()</strong> method
+of the Candidate class.</p>
+<p>To support the <a class="reference internal" href="parameters.html#pages-parameters"><span class="std std-ref">BAD parameters API</span></a>, the
+Candidate <strong>__init__()</strong> method must be implemented with the following
+signature.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+    <span class="c1"># Extract parameters from kwargs ...</span>
+</pre></div>
+</div>
+<p>The keys in the <strong>kwargs</strong> dict will match the keys defined in the
+<em>candidate_parameters.txt</em> file. For more details, see
+<a class="reference internal" href="parameters.html#pages-parameters"><span class="std std-ref">hyper-parameter tuning</span></a>.</p>
+<p>The special key <em>seed</em> is always provided by the framework to be used
+as an RNG seed for replicable experiments. You can override the seed
+in the Candidate parameters file.</p>
+</div>
+<div class="section" id="contributing-candidates">
+<h2>Contributing Candidates<a class="headerlink" href="#contributing-candidates" title="Permalink to this headline">¶</a></h2>
+<p>TODO</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="parameters.html" class="btn btn-neutral float-right" title="Hyper-parameter tuning" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="datasets.html" class="btn btn-neutral float-left" title="Data sets" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Sivam Pasupathipillai
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

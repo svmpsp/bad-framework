@@ -4,6 +4,7 @@ __pycache__
 bad_framework.egg-info
 build
 dist
+docs/.buildinfo
 docsrc/_build
 venv-bad-framework
 *~
