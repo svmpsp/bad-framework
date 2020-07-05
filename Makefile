@@ -3,9 +3,11 @@
 PYTHON_VERSION ?= 3.7.5
 PACKAGE_NAME ?= bad_framework
 VENV_NAME := $(PACKAGE_NAME)-$(PYTHON_VERSION)
+SRC_DIR ?= bad_framework
+TEST_DIR ?= tests
 INSTALL_DIR ?= install
 
-.PHONY: clean package push-test push test venv
+.PHONY: clean package push-test push
 
 all: package
 
@@ -15,25 +17,26 @@ all: package
 	pyenv local $(VENV_NAME)
 	@echo "<<< Done."
 
-venv: .python-version requirements.txt
+$(VENV_NAME)/bin/activate: .python-version requirements.txt
 	@echo ">>> Updating venv dependencies..."
 	pip install -U pip
 	pip install -r requirements.txt
 	pip install -e .
 	@echo "<<< Done."
 
-docs: .python-version venv
+docs: .python-version $(VENV_NAME)/bin/activate
 	@echo ">>> Creating project documentation..."
 	$(MAKE) -C docsrc html
 	cp -a ./docsrc/_build/html/. ./docs
 	@echo "<<< Done"
 
-test: setup.py venv
+test: pytest_report $(VENV_NAME)/bin/activate
+pytest_report: $(SRC_DIR) $(TEST_DIR)
 	@echo ">>> Running tests..."
-	python3 -m unittest -v --catch --failfast --locals
+	pytest && touch pytest_report
 	@echo "<<< Done."
 
-package: docs venv test
+package: docs pytest_report $(VENV_NAME)/bin/activate
 	@echo ">>> Packaging BAD client..."
 	python3 setup.py sdist bdist_wheel
 	@echo "<<< Done."
