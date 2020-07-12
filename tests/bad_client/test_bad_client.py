@@ -4,8 +4,77 @@ Test module for the main bad-client module.
 Global test fixtures are defined in 'bad-framework/tests/conftest.py'
 """
 import pytest
+import sys
 
-from bad_framework.bad_client import parse_config_file, print_config
+from bad_framework.bad_client import (
+    add_settings,
+    parse_arguments,
+    parse_config_file,
+    print_config,
+)
+
+
+def test_add_settings():
+    dummy_config = {
+        "dummy_one": 1,
+        "dummy_two": 2,
+    }
+    new_settings = {
+        "dummy_three": 3,
+    }
+    expected_config = {
+        "dummy_one": 1,
+        "dummy_two": 2,
+        "dummy_three": 3,
+    }
+    assert expected_config == add_settings(dummy_config, new_settings)
+
+
+def test_add_settings_to_empty_config():
+    dummy_config = {}
+    new_settings = {
+        "dummy_one": 1,
+    }
+    expected_config = {
+        "dummy_one": 1,
+    }
+    assert expected_config == add_settings(dummy_config, new_settings)
+
+
+def test_add_settings_without_settings():
+    dummy_config = {
+        "dummy_one": 1,
+    }
+    new_settings = {}
+    expected_config = {
+        "dummy_one": 1,
+    }
+    assert expected_config == add_settings(dummy_config, new_settings)
+
+
+def test_add_settings_does_not_overwrite():
+    dummy_config = {
+        "dummy_one": "old_value",
+    }
+    new_settings = {
+        "dummy_one": "new_value",
+    }
+    expected_config = {
+        "dummy_one": "old_value",
+    }
+    assert expected_config == add_settings(dummy_config, new_settings)
+
+
+def test_parse_arguments(monkeypatch):
+    with monkeypatch.context() as mp:
+        mp.setattr(sys, "argv", ["bad", "run", "-c", "./dummy_candidate.py"])
+        expected_config = {
+            "command": "run",
+            "bad.candidate": "./dummy_candidate.py",
+            "bad.debug": False,
+            "bad.log.verbose": False,
+        }
+        assert expected_config == parse_arguments()
 
 
 def test_parse_config_file_not_found():

@@ -1,6 +1,7 @@
 black
 pytest
 pytest-black
+pytest-cov
 pytest-flake8
 sphinx
 sphinx-rtd-theme

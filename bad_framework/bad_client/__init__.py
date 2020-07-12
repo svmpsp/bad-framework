@@ -30,13 +30,6 @@ logging.basicConfig(
 )
 log = logging.getLogger("bad.client")
 
-DEFAULT_PARAMETERS = {
-    "bad.candidate.parameters": "candidate_parameters.txt",
-    "bad.candidate.requirements": "candidate_requirements.txt",
-    "bad.default.conf": "conf/defaults.conf",
-    "bad.dump.file": "bad_dump.csv",
-}
-
 
 def parse_config_file(config_filepath):
     if not os.path.exists(config_filepath):
@@ -51,7 +44,13 @@ def parse_config_file(config_filepath):
     return loaded_settings
 
 
-def override_settings(runtime_config, loaded_settings):
+def add_settings(runtime_config, loaded_settings):
+    """Appends the loaded settings to runtime config, unless they are already defined.
+
+    :param runtime_config (dict): current runtime config.
+    :param loaded_settings (dict): additional config settings.
+    :return: (dict) updated runtime config.
+    """
     for key in loaded_settings.keys():
         if key not in runtime_config.keys():
             runtime_config[key] = loaded_settings[key]
@@ -67,23 +66,32 @@ def load_default_config(runtime_config):
     :param runtime_config: (dict) runtime configuration.
     :return: (dict) updated runtime configuration.
     """
-    default_config_path = os.path.join(
-        os.getcwd(), DEFAULT_PARAMETERS["bad.default.conf"],
-    )
+    default_config_path = os.path.join(os.getcwd(), "conf/defaults.conf",)
     if os.path.exists(default_config_path):
         loaded_settings = parse_config_file(default_config_path)
-        runtime_config = override_settings(runtime_config, loaded_settings)
+        runtime_config = add_settings(runtime_config, loaded_settings)
     return runtime_config
 
 
 def parse_arguments():
+    """Defines and parses command-line arguments.
+
+    The following positional arguments are required:
+     - command
+
+    The returned dictionary always contains the following boolean flag arguments:
+     - bad.debug
+     - bad.log.verbose
+
+    Optional arguments non present on the command-line are not returned.
+
+    See https://docs.python.org/3/library/argparse.html for details.
+
+    :return: (dict) runtime configuration dictionary.
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "command",
-        type=str,
-        choices=get_commands(),
-        default=None,
-        help="BAD framework command",
+        "command", type=str, choices=get_commands(), help="BAD framework command",
     )
     parser.add_argument(
         "-c",
@@ -93,21 +101,15 @@ def parse_arguments():
         help="path to Candidate implementation",
     )
     parser.add_argument(
-        "-d", "--data", dest="bad.data", type=str, help="data set identifier"
+        "-d", "--data", dest="bad.data", type=str, help="data set identifier",
     )
     parser.add_argument(
-        "-o",
-        "--dump-file",
-        dest="bad.dump.file",
-        default=DEFAULT_PARAMETERS["bad.dump.file"],
-        type=str,
-        help="path to output file",
+        "-o", "--dump-file", dest="bad.dump.file", type=str, help="path to output file",
     )
     parser.add_argument(
         "-p",
         "--parameters",
         dest="bad.candidate.parameters",
-        default=DEFAULT_PARAMETERS["bad.candidate.parameters"],
         type=str,
         help="path to Candidate parameters file",
     )
@@ -115,7 +117,6 @@ def parse_arguments():
         "-q",
         "--requirements",
         dest="bad.candidate.requirements",
-        default=DEFAULT_PARAMETERS["bad.candidate.requirements"],
         type=str,
         help="path to Candidate requirements.txt file",
     )
@@ -133,7 +134,11 @@ def parse_arguments():
         dest="bad.debug",
         help="run the framework in development mode",
     )
-    return parser.parse_args()
+    parsed_args = vars(parser.parse_args())
+    # Remove None-valued args
+    for none_key in [k for k, v in parsed_args.items() if v is None]:
+        del parsed_args[none_key]
+    return parsed_args
 
 
 def print_config(config):
@@ -144,7 +149,7 @@ def print_config(config):
 
 
 def main():
-    config = vars(parse_arguments())
+    config = parse_arguments()
 
     if config["bad.log.verbose"]:
         log.setLevel("DEBUG")

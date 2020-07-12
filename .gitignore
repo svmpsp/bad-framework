@@ -1,3 +1,4 @@
+.coverage
 .idea
 .python-version
 .pytest_report

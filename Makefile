@@ -9,8 +9,10 @@ TEST_DIR ?= tests
 INSTALL_DIR ?= install
 
 SOURCES ?= $(shell find $(PACKAGE_NAME))
-TEST_SOURCES ?= $(shell find tests)
+TEST_SOURCES ?= setup.cfg $(shell find tests)
 DOC_SOURCES ?= $(shell find docsrc)
+
+PYTEST_OPTS ?= -vv --black --flake8 --cov=$(PACKAGE_NAME) --cov-fail-under=10
 
 .PHONY: clean help
 
@@ -40,7 +42,8 @@ test: .pytest_report
 .pytest_report: $(TEST_SOURCES) $(SOURCES) .python-version
 	@echo ">>> Running tests..."
 	-rm .pytest_report
-	pytest -v --black --flake8 && (echo "All is well!" > .pytest_report)
+	-rm .coverage
+	pytest $(PYTEST_OPTS) && (echo "All is well!" > .pytest_report)
 	@echo "<<< Done."
 
 ### - package: packages the project for distribution via PyPI.
@@ -77,10 +80,11 @@ push: .pypi_report
 ### - clean: cleans project directory.
 clean:
 	@echo ">>> Cleaning project directory..."
-	-rm -rf ./*~
-	-rm -rf .python-version
-	-rm -rf .pytest_report
-	-rm -rf .pypi_report
+	-rm -rf ./*~  # Removes Emacs backup files
+	-rm .coverage
+	-rm .pytest_report
+	-rm .pypi_report
+	-rm .python-version
 	-pyenv uninstall -f $(VENV_NAME)
 	-rm -rf $(INSTALL_DIR)
 	-rm -rf build
