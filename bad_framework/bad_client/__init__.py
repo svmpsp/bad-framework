@@ -1,4 +1,5 @@
-# Copyright (c) 2020 Sivam Pasupathipillai <s.pasupathipillai@unitn.it>. All rights reserved.
+# Copyright (c) 2020 Sivam Pasupathipillai <s.pasupathipillai@unitn.it>.
+# All rights reserved.
 """
 Command-line client for the Benchmarking Anomaly Detection (BAD) framework.
 
@@ -22,12 +23,39 @@ from bad_framework.bad_utils.files import init_working_directory, is_directory_i
 
 from .cli import get_commands, handle_command
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)5s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+log = logging.getLogger("bad.client")
+
 DEFAULT_PARAMETERS = {
     "bad.candidate.parameters": "candidate_parameters.txt",
     "bad.candidate.requirements": "candidate_requirements.txt",
     "bad.default.conf": "conf/defaults.conf",
     "bad.dump.file": "bad_dump.csv",
 }
+
+
+def parse_config_file(config_filepath):
+    if not os.path.exists(config_filepath):
+        raise ValueError("Config file not found: '{}'", config_filepath)
+    with open(config_filepath, "r") as config_file:
+        key_value_pairs = [
+            re.split(r"\s+", line.strip())
+            for line in config_file
+            if line.strip() and not line.startswith("#")
+        ]
+        loaded_settings = dict(key_value_pairs)
+    return loaded_settings
+
+
+def override_settings(runtime_config, loaded_settings):
+    for key in loaded_settings.keys():
+        if key not in runtime_config.keys():
+            runtime_config[key] = loaded_settings[key]
+    return runtime_config
 
 
 def load_default_config(runtime_config):
@@ -43,16 +71,8 @@ def load_default_config(runtime_config):
         os.getcwd(), DEFAULT_PARAMETERS["bad.default.conf"],
     )
     if os.path.exists(default_config_path):
-        with open(default_config_path, "r") as config_file:
-            key_value_pairs = [
-                re.split(r"\s+", line.strip())
-                for line in config_file
-                if line.strip() and not line.startswith("#")
-            ]
-            loaded_settings = dict(key_value_pairs)
-        for key in loaded_settings.keys():
-            if key not in runtime_config.keys():
-                runtime_config[key] = loaded_settings[key]
+        loaded_settings = parse_config_file(default_config_path)
+        runtime_config = override_settings(runtime_config, loaded_settings)
     return runtime_config
 
 
@@ -117,7 +137,6 @@ def parse_arguments():
 
 
 def print_config(config):
-    log = config["log"]
     log.debug("Config = {")
     for k, v in config.items():
         log.debug("  %s = %r", k, v)
@@ -126,13 +145,6 @@ def print_config(config):
 
 def main():
     config = vars(parse_arguments())
-
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s - %(name)s - %(levelname)5s - %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S",
-    )
-    log = logging.getLogger("bad.client")
 
     if config["bad.log.verbose"]:
         log.setLevel("DEBUG")
@@ -143,7 +155,6 @@ def main():
         init_working_directory(cwd)
 
     config = load_default_config(config)
-    config["log"] = log
 
     print_config(config)
 
