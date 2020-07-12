@@ -36,11 +36,11 @@ docs: $(DOC_SOURCES) .python-version
 	@echo "<<< Done"
 
 ### - test: runs unit and integration tests.
-test: pytest_report
+test: .pytest_report
 .pytest_report: $(TEST_SOURCES) $(SOURCES) .python-version
 	@echo ">>> Running tests..."
 	-rm .pytest_report
-	pytest && (echo "All is well!" > .pytest_report)
+	pytest -v --black --flake8 && (echo "All is well!" > .pytest_report)
 	@echo "<<< Done."
 
 ### - package: packages the project for distribution via PyPI.
@@ -53,9 +53,9 @@ dist: .python-version .pytest_report docs
 ### - debug: creates a test installation for debugging purposes.
 debug: $(SRC_DIR) .pytest_report
 	@echo ">>> Creating installation directory..."
-	pip install -e .
 	[[ -d $(INSTALL_DIR) ]] || mkdir $(INSTALL_DIR)
 	@echo ">>> Starting debug session..."
+	pip install -e .
 	@cd $(INSTALL_DIR) && bash
 	rm -rf $(INSTALL_DIR)
 	@echo "<<< Done."

@@ -13,7 +13,7 @@ log = logging.getLogger("bad.client")
 
 def monitor_suite(master_session, suite_id, heartbeat_interval=1):
     """Monitors the suite execution from the client. Polls status updates
-    at regular intevals and prints a status bar.
+    at regular intervals and prints a status bar.
 
     :param master_session:
     :param suite_id:
@@ -43,9 +43,7 @@ def monitor_suite(master_session, suite_id, heartbeat_interval=1):
         )
         for experiment in suite_experiments["experiments"]:
             if status_cache[experiment["id"]] != experiment["status"]:
-                log.debug(
-                    "Experiment %s - %s", experiment["id"], experiment["status"]
-                )
+                log.debug("Experiment %s - %s", experiment["id"], experiment["status"])
                 status_cache[experiment["id"]] = experiment["status"]
         completed_experiments_num = len(
             [status for status in status_cache.values() if status == "completed"]

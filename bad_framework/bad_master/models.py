@@ -81,7 +81,7 @@ class Dataset(Model):
         arff_files = glob.glob("{data_dir}/*.arff".format(data_dir=data_dir))
         for dataset_file in arff_files:
             dataset_name = os.path.splitext(os.path.basename(dataset_file))[0]
-            Dataset.create(dataset_name=dataset_name, file_path=dataset_file)
+            cls.create(dataset_name=dataset_name, file_path=dataset_file)
 
 
 class Experiment(Model):

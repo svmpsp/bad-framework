@@ -38,18 +38,23 @@ class BaseWorkerHandler(tornado.web.RequestHandler):
     def head(self):
         self.set_status(200)
         self.flush()
+        self.finish()
 
 
 class IndexHandler(BaseWorkerHandler):
     def get(self):
-        jinja2_env = j2.Environment(
-            loader=j2.PackageLoader("bad_framework.bad_worker", "templates")
-        )
-        template = jinja2_env.get_template("index.html")
-        rendered_template = template.render()
-        self.set_status(200)
-        self.set_header("Content-type", "text/html")
-        self.write(rendered_template.encode())
+        try:
+            jinja2_env = j2.Environment(
+                loader=j2.PackageLoader("bad_framework.bad_worker", "templates")
+            )
+            template = jinja2_env.get_template("index.html")
+            rendered_template = template.render()
+            self.set_status(200)
+            self.set_header("Content-type", "text/html")
+            self.write(rendered_template.encode())
+        finally:
+            self.flush()
+            self.finish()
 
 
 class SetupHandler(BaseWorkerHandler):
@@ -132,6 +137,8 @@ class SetupHandler(BaseWorkerHandler):
             self.set_status(status_code=200)
         except Exception:
             log.error(traceback.format_exc())  # Write on worker log
+        finally:
+            await self.finish()
 
 
 class RunHandler(BaseWorkerHandler):
@@ -233,10 +240,17 @@ class RunHandler(BaseWorkerHandler):
         results_url = "experiment/{experiment_id}/results/".format(
             experiment_id=self._experiment_id,
         )
+
+        with open(metrics_path, "rb") as metrics_file:
+            metrics_content = metrics_file.read()
+
+        with open(roc_path, "rb") as roc_file:
+            roc_content = roc_file.read()
+
         files = {
             # "scores": open(scores_path, "rb"),
-            "metrics.json": open(metrics_path, "rb"),
-            "roc.png": open(roc_path, "rb"),
+            "metrics.json": metrics_content,
+            "roc.png": roc_content,
         }
         await self._master_session.post_files(url=results_url, files=files)
 
@@ -298,3 +312,5 @@ class RunHandler(BaseWorkerHandler):
             self.set_status(status_code=200)
         except Exception:
             log.error(traceback.format_exc())  # Write on worker log
+        finally:
+            await self.finish()

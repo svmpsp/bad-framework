@@ -69,6 +69,7 @@ else
   ssh -qT "$BAD_WORKER_HOST" <<REMOTE_SCRIPT
   virtualenv  "$VENV_DIR"
   source "$VENV_DIR/bin/activate"
+  pip install --upgrade pip
   pip install --upgrade bad-framework
 REMOTE_SCRIPT
 

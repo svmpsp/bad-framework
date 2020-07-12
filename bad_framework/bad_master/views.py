@@ -47,6 +47,7 @@ class BaseMasterHandler(tornado.web.RequestHandler):
         """Handler for HTTP HEAD method."""
         self.set_status(200)
         self.flush()
+        self.finish()
 
     def get_file_contents(self, file_name):
         """Returns the body of a multi-part encoded file sent with the HTTP request.
@@ -147,6 +148,7 @@ class DatasetHandler(BaseMasterHandler):
             self.set_status(status_code=500, reason=str(e))
         finally:
             self.flush()
+            self.finish()
 
 
 class ExperimentHandler(BaseMasterHandler):
@@ -193,6 +195,7 @@ class ExperimentHandler(BaseMasterHandler):
             self.set_status(status_code=500, reason=str(e))
         finally:
             self.flush()
+            self.finish()
 
     def post(self, experiment_id):
         """Handler for HTTP POST method.
@@ -208,7 +211,7 @@ class ExperimentHandler(BaseMasterHandler):
             log.error(traceback.format_exc())
             self.set_status(500, reason=str(e))
         finally:
-            self.flush()
+            self.finish()
 
 
 class ResultHandler(BaseMasterHandler):
@@ -257,6 +260,8 @@ class ResultHandler(BaseMasterHandler):
         except Exception as e:
             log.error(traceback.format_exc())
             self.set_status(500, reason=str(e))
+        finally:
+            self.finish()
 
     def _get_metrics_file(self, experiment_id):
         """Writes the metric.json file contents to the output stream.
@@ -296,6 +301,7 @@ class ResultHandler(BaseMasterHandler):
             self.set_status(500, reason=str(e))
         finally:
             self.flush()
+            self.finish()
 
 
 class SuiteHandler(BaseMasterHandler):
@@ -342,9 +348,6 @@ class SuiteHandler(BaseMasterHandler):
         :return: (list[models.Experiment]) list of created experiments
         """
         for experiment_setting in generate_experiments_settings(datasets, parameters):
-            log.info(
-                "Experiment settings parameters: %s", experiment_setting.parameters
-            )
             Experiment.create(
                 suite_id=suite.id,
                 candidate_id=candidate.id,
@@ -476,14 +479,21 @@ class SuiteHandler(BaseMasterHandler):
             )
             parameters = load_parameters(candidate.parameters, suite)
             experiments = self._generate_suite_experiments(
-                suite=suite, candidate=candidate, datasets=datasets, parameters=parameters
+                suite=suite,
+                candidate=candidate,
+                datasets=datasets,
+                parameters=parameters,
             )
             await self._initialize_worker_envs(
                 suite.id, candidate.id, workers, datasets
             )
 
             # runs scheduling loop in the background
-            IOLoop.current().add_callback(callback=self._start_scheduling_loop, experiments=experiments, workers=workers)
+            IOLoop.current().add_callback(
+                callback=self._start_scheduling_loop,
+                experiments=experiments,
+                workers=workers,
+            )
 
             message = {"suite_id": suite.id}
             self.write(message)
@@ -491,6 +501,8 @@ class SuiteHandler(BaseMasterHandler):
         except Exception as e:
             log.error(traceback.format_exc())
             self.set_status(500, reason=str(e))
+        finally:
+            await self.finish()
 
     def _render_suite_details(self, suite_id):
         """Renders the suite details HTML page.
@@ -522,6 +534,7 @@ class SuiteHandler(BaseMasterHandler):
             self.set_status(status_code=500, reason=str(e))
         finally:
             self.flush()
+            self.finish()
 
 
 class SuiteExperimentsHandler(BaseMasterHandler):
@@ -551,6 +564,9 @@ class SuiteExperimentsHandler(BaseMasterHandler):
         except Exception as e:
             log.error(traceback.format_exc())  # Write on master log
             self.set_status(500, reason=str(e))
+        finally:
+            self.flush()
+            self.finish()
 
 
 class SuiteDumpHandler(BaseMasterHandler):
@@ -614,3 +630,6 @@ class SuiteDumpHandler(BaseMasterHandler):
         except Exception as e:
             log.error(traceback.format_exc())  # Write on master log
             self.set_status(500, reason=str(e))
+        finally:
+            self.flush()
+            self.finish()

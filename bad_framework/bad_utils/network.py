@@ -1,4 +1,4 @@
-from tempfile import TemporaryFile
+from tempfile import NamedTemporaryFile
 from threading import Thread
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 import httpx
@@ -12,18 +12,12 @@ from .files import save_file
 class HTTPSessionManager:
     """Utility class for managing a persistent HTTP session."""
 
-    def __init__(self, domain, timeout=600):
+    def __init__(self, domain):
         """Initializes the SessionManager to connect to a given hostname. A connection timeout can be optionally
         specified.
 
         :param domain: (string) destination hostname
-        :param timeout: (int) connection timeout in seconds
         """
-        try:
-            int(timeout)
-        except TypeError:
-            raise ValueError("invalid timeout value {}".format(timeout))
-
         if domain.startswith("http://"):
             self._fq_domain = domain
         else:
@@ -31,7 +25,6 @@ class HTTPSessionManager:
 
         if httpx.head(self._fq_domain).status_code == 200:
             self._session = requests.Session()
-            self._timeout = timeout
         else:
             raise ValueError("cannot connect to host {}".format(self._fq_domain))
 
@@ -44,29 +37,28 @@ class HTTPSessionManager:
 
         :param url: (string) URL to the resource.
         :param path: (string) optional path to file.
-        :return: handle to the temporary file.
+        :return: (string) downloaded file path.
         """
         get_url = "{}/{}".format(self._fq_domain, url)
-        r = self._session.get(get_url, timeout=self._timeout)
+        r = self._session.get(get_url)
         if r.status_code == 200:
             if path:
                 save_file(r.content, path)
-                return open(path, "rb")
+                return path
             else:
-                fp = TemporaryFile()
-                fp.write(r.content)
-                fp.seek(0)
-                return fp
+                with NamedTemporaryFile() as ntf:
+                    ntf.write(r.content)
+                return ntf.name
         else:
             raise ValueError(r.status_code)
 
     def get(self, url):
         get_url = "{}/{}".format(self._fq_domain, url)
-        return self._session.get(get_url, timeout=self._timeout)
+        return self._session.get(get_url)
 
     def get_json(self, url):
         get_url = "{}/{}".format(self._fq_domain, url)
-        r = self._session.get(get_url, timeout=self._timeout)
+        r = self._session.get(get_url)
         if r.status_code == 200:
             return json.loads(r.content)
         raise ValueError(r.status_code)
@@ -79,37 +71,33 @@ class HTTPSessionManager:
         :return: (requests.Response) server response.
         """
         post_url = "{}/{}".format(self._fq_domain, url)
-        return self._session.post(post_url, json=data, timeout=self._timeout)
+        return self._session.post(post_url, json=data)
 
     def post_files(self, url, files):
         post_url = "{}/{}".format(self._fq_domain, url)
-        return self._session.post(post_url, files=files, timeout=self._timeout)
+        return self._session.post(post_url, files=files)
 
 
 class AsyncHTTPSessionManager:
     """Utility class for managing a persistent HTTP session."""
 
-    def __init__(self, domain, timeout=600):
+    def __init__(self, domain, timeout=300):
         """Initializes the SessionManager to connect to a given hostname. A connection timeout can be optionally
         specified.
 
         :param domain: (string) destination hostname
-        :param timeout: (int) connection timeout in seconds
         """
         try:
-            int(timeout)
-        except TypeError:
-            raise ValueError("invalid timeout value {}".format(timeout))
+            self._timeout = int(timeout)
+        except ValueError:
+            raise ValueError("Invalid connection timeout value: {}".format(timeout))
 
         if domain.startswith("http://"):
             self._fq_domain = domain
         else:
             self._fq_domain = "http://" + domain
 
-        if httpx.head(self._fq_domain).status_code == 200:
-            self._session = httpx.AsyncClient()
-            self._timeout = timeout
-        else:
+        if not httpx.head(self._fq_domain).status_code == 200:
             raise ValueError("cannot connect to host {}".format(self._fq_domain))
 
     async def download_file(self, url, path=None):
@@ -121,29 +109,34 @@ class AsyncHTTPSessionManager:
 
         :param url: (string) URL to the resource.
         :param path: (string) optional path to file.
-        :return: handle to the temporary file.
+        :return: (string) path to the downloaded file.
         """
         get_url = "{}/{}".format(self._fq_domain, url)
-        r = await self._session.get(get_url, timeout=self._timeout)
+
+        async with httpx.AsyncClient() as client:
+            r = await client.get(get_url, timeout=self._timeout)
+
         if r.status_code == 200:
             if path:
                 save_file(r.content, path)
-                return open(path, "rb")
+                return path
             else:
-                fp = TemporaryFile()
-                fp.write(r.content)
-                fp.seek(0)
-                return fp
+                with NamedTemporaryFile() as ntf:
+                    ntf.write(r.content)
+                return ntf.name
         else:
             raise ValueError(r.status_code)
 
     async def get(self, url):
         get_url = "{}/{}".format(self._fq_domain, url)
-        return await self._session.get(get_url, timeout=self._timeout)
+        async with httpx.AsyncClient() as client:
+            r = await client.get(get_url, timeout=self._timeout)
+        return r
 
     async def get_json(self, url):
         get_url = "{}/{}".format(self._fq_domain, url)
-        r = await self._session.get(get_url, timeout=self._timeout)
+        async with httpx.AsyncClient() as client:
+            r = await client.get(get_url, timeout=self._timeout)
         if r.status_code == 200:
             return json.loads(r.content)
         raise ValueError(r.status_code)
@@ -156,11 +149,15 @@ class AsyncHTTPSessionManager:
         :return: (requests.Response) server response.
         """
         post_url = "{}/{}".format(self._fq_domain, url)
-        return await self._session.post(post_url, json=data, timeout=self._timeout)
+        async with httpx.AsyncClient() as client:
+            r = await client.post(post_url, json=data, timeout=self._timeout)
+        return r
 
     async def post_files(self, url, files):
         post_url = "{}/{}".format(self._fq_domain, url)
-        return await self._session.post(post_url, files=files, timeout=self._timeout)
+        async with httpx.AsyncClient() as client:
+            r = await client.post(post_url, files=files, timeout=self._timeout)
+        return r
 
 
 class MockHTTPHandler(SimpleHTTPRequestHandler):

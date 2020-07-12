@@ -25,12 +25,14 @@ def get_candidate_name(candidate_path):
     """
     # Matches a python class definition and captures the class name.
     class_name_re = re.compile(r"^class[\s]+(\w+)[(:]")
+    candidate_name = None
     with open(candidate_path, "r") as candidate_file:
         for line in candidate_file.readlines():
             match = class_name_re.match(line)
             if match:
-                # Return first capture group, class name
-                return str(match[1])
+                # The first capture group is the class name
+                candidate_name = str(match[1])
+    return candidate_name
 
 
 def get_candidate_file_paths(home_dir, suite_id):

@@ -9,7 +9,6 @@ from bad_framework.bad_utils.files import delete_bad_files
 from bad_framework.bad_utils.network import HTTPSessionManager
 
 from .monitor import monitor_suite
-from .settings import *
 
 log = logging.getLogger("bad.client")
 
@@ -39,15 +38,14 @@ def generate_suite_settings(config):
 
 
 def download_dump_file(config, suite_id):
-    dump_file_path = config[BAD_DUMP_FILE_KEY]
+    dump_file_path = config["bad.dump.file"]
     log.info(">>> Saving suite dump to %s", dump_file_path)
     session_manager = HTTPSessionManager(
         domain="{master_hostname}:{master_port}".format(
-            master_hostname=config[BAD_MASTER_KEY],
-            master_port=config[BAD_MASTER_PORT_KEY],
+            master_hostname=config["bad.master"], master_port=config["bad.master.port"],
         )
     )
-    suite_dump_url = BAD_MASTER_SUITE_DUMP_TEMPLATE.format(suite_id)
+    suite_dump_url = "suite/{sid}/dump/".format(sid=suite_id)
     response = session_manager.get(suite_dump_url)
 
     with open(dump_file_path, "wb+") as dump_file:
@@ -74,16 +72,17 @@ def _create_suite(config):
     suite_settings = generate_suite_settings(config)
     encoded_settings = bytes(json.dumps(suite_settings), encoding="utf-8")
 
-    log.info(">>> Submitting candidate %s", config[BAD_CANDIDATE_KEY])
+    candidate = config["bad.candidate"]
+    log.info(">>> Submitting candidate %s", candidate)
     files = {
         "suite_settings": encoded_settings,
-        "candidate_source": open(config[BAD_CANDIDATE_KEY], "rb").read(),
+        "candidate_source": open(candidate, "rb").read(),
         "candidate_requirements": open(
-            config[BAD_CANDIDATE_REQUIREMENTS_KEY], "rb"
+            config["bad.candidate.requirements"], "rb"
         ).read(),
-        "candidate_parameters": open(config[BAD_CANDIDATE_PARAMETERS_KEY], "rb").read(),
+        "candidate_parameters": open(config["bad.candidate.parameters"], "rb").read(),
     }
-    suite_submit_url = BAD_MASTER_SUITE_SUBMIT_URL
+    suite_submit_url = "suite/"
     suite_response = master_session.post_files(suite_submit_url, files=files)
 
     if suite_response.status_code == 200:
@@ -178,7 +177,7 @@ def is_config_valid(config, command):
     """
     print(command)
 
-    required_args = [(BAD_CANDIDATE_KEY, BAD_CANDIDATE_FLAG)]
+    required_args = [("-c", "bad.candidate")]
     for param, flag in required_args:
         if param not in config:
             raise ValueError(

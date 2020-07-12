@@ -1,5 +1,4 @@
 import os
-import shutil
 import subprocess
 
 from bad_framework.bad_utils.files import get_include_dir
@@ -16,7 +15,7 @@ def start_bad_master(port, debug=False):
     """
     package_bin_dir = "{include_dir}/bin".format(include_dir=get_include_dir())
     params = {
-        "flag": "BAD_DEBUG=0" if debug else "",
+        "flag": "BAD_DEBUG=true" if debug else "",
         "script": os.path.join(package_bin_dir, "start_master.sh"),
         "port": port,
     }

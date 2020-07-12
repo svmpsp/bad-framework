@@ -7,7 +7,6 @@ import tornado.web
 
 from .views import IndexHandler, SetupHandler, RunHandler
 
-options
 define(
     "worker_home",
     default="/tmp/bad-framework",

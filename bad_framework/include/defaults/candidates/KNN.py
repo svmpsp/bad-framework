@@ -4,7 +4,8 @@ from sklearn.neighbors import NearestNeighbors
 class KNN:
     """Implements the KNN outlier detection method proposed in
 
-     Ramaswamy, Sridhar, Rajeev Rastogi, and Kyuseok Shim. "Efficient algorithms for mining outliers from large data sets."
+     Ramaswamy, Sridhar, Rajeev Rastogi, and Kyuseok Shim.
+     "Efficient algorithms for mining outliers from large data sets."
      ACM Sigmod Record. Vol. 29. No. 2. ACM, 2000.
 
      This method assigns an outlier score to each data elements corresponding to the distance with its

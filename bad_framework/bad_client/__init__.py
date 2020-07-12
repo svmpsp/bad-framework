@@ -20,16 +20,13 @@ import sys
 
 from bad_framework.bad_utils.files import init_working_directory, is_directory_init
 
-from . import monitor
-from . import ui
 from .cli import get_commands, handle_command
-from .settings import *
 
 DEFAULT_PARAMETERS = {
-    BAD_CANDIDATE_PARAMETERS_KEY: "candidate_parameters.txt",
-    BAD_CANDIDATE_REQUIREMENTS_KEY: "candidate_requirements.txt",
-    BAD_CONF_FILE_KEY: "conf/defaults.conf",
-    BAD_DUMP_FILE_KEY: "bad_dump.csv",
+    "bad.candidate.parameters": "candidate_parameters.txt",
+    "bad.candidate.requirements": "candidate_requirements.txt",
+    "bad.default.conf": "conf/defaults.conf",
+    "bad.dump.file": "bad_dump.csv",
 }
 
 
@@ -43,7 +40,7 @@ def load_default_config(runtime_config):
     :return: (dict) updated runtime configuration.
     """
     default_config_path = os.path.join(
-        os.getcwd(), DEFAULT_PARAMETERS[BAD_CONF_FILE_KEY],
+        os.getcwd(), DEFAULT_PARAMETERS["bad.default.conf"],
     )
     if os.path.exists(default_config_path):
         with open(default_config_path, "r") as config_file:
@@ -71,7 +68,7 @@ def parse_arguments():
     parser.add_argument(
         "-c",
         "--candidate",
-        dest=BAD_CANDIDATE_KEY,
+        dest="bad.candidate",
         type=str,
         help="path to Candidate implementation",
     )
@@ -81,24 +78,24 @@ def parse_arguments():
     parser.add_argument(
         "-o",
         "--dump-file",
-        dest=BAD_DUMP_FILE_KEY,
-        default=DEFAULT_PARAMETERS[BAD_DUMP_FILE_KEY],
+        dest="bad.dump.file",
+        default=DEFAULT_PARAMETERS["bad.dump.file"],
         type=str,
         help="path to output file",
     )
     parser.add_argument(
         "-p",
         "--parameters",
-        dest=BAD_CANDIDATE_PARAMETERS_KEY,
-        default=DEFAULT_PARAMETERS[BAD_CANDIDATE_PARAMETERS_KEY],
+        dest="bad.candidate.parameters",
+        default=DEFAULT_PARAMETERS["bad.candidate.parameters"],
         type=str,
         help="path to Candidate parameters file",
     )
     parser.add_argument(
         "-q",
         "--requirements",
-        dest=BAD_CANDIDATE_REQUIREMENTS_KEY,
-        default=DEFAULT_PARAMETERS[BAD_CANDIDATE_REQUIREMENTS_KEY],
+        dest="bad.candidate.requirements",
+        default=DEFAULT_PARAMETERS["bad.candidate.requirements"],
         type=str,
         help="path to Candidate requirements.txt file",
     )
