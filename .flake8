@@ -1,14 +1,11 @@
 [flake8]
 exclude =
-    .git,
-	__pycache__,
-	docsrc/conf.py,
-	build,
+    .git
+	__pycache__
+	build
 	dist
+	docsrc/conf.py
 max-complexity = 8
 max-line-length = 90
 ignore =
     E203 # ignore whitespace around ':' in slices.
-
-[cov]
-cov-min = 75

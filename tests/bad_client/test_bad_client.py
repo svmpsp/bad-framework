@@ -8,6 +8,7 @@ import sys
 
 from bad_framework.bad_client import (
     add_settings,
+    load_default_config,
     parse_arguments,
     parse_config_file,
     print_config,
@@ -65,6 +66,44 @@ def test_add_settings_does_not_overwrite():
     assert expected_config == add_settings(dummy_config, new_settings)
 
 
+def test_load_default_config(tmp_path):
+    import os
+
+    config_file_content = "\n".join(
+        ["dummy.path    /config/file/path", "dummy.string  hello", "dummy.value   123"]
+    )
+    os.chdir(tmp_path)
+    test_conf_dir = tmp_path / "conf"
+    test_conf_dir.mkdir()
+    config_file = test_conf_dir / "defaults.conf"
+    config_file.write_text(config_file_content)
+
+    initial_config = {
+        "dummy.path": "original/path",
+        "dummy.value": "456",
+    }
+    expected_config = {
+        "dummy.path": "original/path",
+        "dummy.string": "hello",
+        "dummy.value": "456",
+    }
+    assert expected_config == load_default_config(initial_config)
+
+
+def test_parse_arguments_without_arguments(monkeypatch):
+    with monkeypatch.context() as mp:
+        mp.setattr(sys, "argv", ["bad"])
+        with pytest.raises(SystemExit):
+            parse_arguments()
+
+
+def test_parse_arguments_without_command(monkeypatch):
+    with monkeypatch.context() as mp:
+        mp.setattr(sys, "argv", ["bad", "-c", "./dummy_candidate.py"])
+        with pytest.raises(SystemExit):
+            parse_arguments()
+
+
 def test_parse_arguments(monkeypatch):
     with monkeypatch.context() as mp:
         mp.setattr(sys, "argv", ["bad", "run", "-c", "./dummy_candidate.py"])
@@ -72,6 +111,17 @@ def test_parse_arguments(monkeypatch):
             "command": "run",
             "bad.candidate": "./dummy_candidate.py",
             "bad.debug": False,
+            "bad.log.verbose": False,
+        }
+        assert expected_config == parse_arguments()
+
+
+def test_parse_arguments_with_debug_flag(monkeypatch):
+    with monkeypatch.context() as mp:
+        mp.setattr(sys, "argv", ["bad", "run", "-D"])
+        expected_config = {
+            "command": "run",
+            "bad.debug": True,
             "bad.log.verbose": False,
         }
         assert expected_config == parse_arguments()

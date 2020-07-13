@@ -13,8 +13,7 @@ class HTTPSessionManager:
     """Utility class for managing a persistent HTTP session."""
 
     def __init__(self, domain):
-        """Initializes the SessionManager to connect to a given hostname. A connection timeout can be optionally
-        specified.
+        """Initializes the SessionManager to connect to a given hostname.
 
         :param domain: (string) destination hostname
         """
@@ -82,10 +81,11 @@ class AsyncHTTPSessionManager:
     """Utility class for managing a persistent HTTP session."""
 
     def __init__(self, domain, timeout=300):
-        """Initializes the SessionManager to connect to a given hostname. A connection timeout can be optionally
-        specified.
+        """Initializes the SessionManager to connect to a given hostname.
+        A connection timeout can be optionally specified.
 
-        :param domain: (string) destination hostname
+        :param domain: (string) destination hostname.
+        :param timeout: (int) connection timeout in seconds (defaults=300, or 5 minutes).
         """
         try:
             self._timeout = int(timeout)
@@ -163,10 +163,14 @@ class AsyncHTTPSessionManager:
 class MockHTTPHandler(SimpleHTTPRequestHandler):
     """Implements a simple HTTP server configurable to serve arbitrary content.
 
-    This class should be considered as a singleton. All instances share the same contents.
-    Contents can be added via the serve(obj, at) method and removed via the clear() method.
+    This class should be considered as a singleton.
+    All instances share the same contents.
 
-    The serve() method supports all objects that can be dumped using the json.dumps(obj) function.
+    Contents can be added via the serve(obj, at) method and removed
+    via the clear() method.
+
+    The serve() method supports all objects that can be dumped using
+    the json.dumps(obj) function.
     """
 
     contents = {}
@@ -220,9 +224,10 @@ class MockServer:
     """
 
     def __init__(self, handler_class, port=None):
-        """Initializes the test server with the handler class. A port can be optionally
-        defined for the server to listen on. If not specified the port is randomly selected
-        in the range [10000, 20000].
+        """Initializes the test server with the handler class.
+        A port can be optionally defined for the server to listen on.
+
+        If not specified the port is randomly selected in the range [10000, 20000].
 
         :param handler_class: (SimpleHTTPRequestHandler) handler for the HTTP requests.
         :param port: (int) port for the server to listen on.

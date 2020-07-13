@@ -1,4 +1,5 @@
 black
+pyod
 pytest
 pytest-black
 pytest-cov

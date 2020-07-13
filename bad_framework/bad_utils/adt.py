@@ -7,7 +7,12 @@
     - requirements_path, path to Candidate requirements file.
     - parameters_path, path to Candidate parameters file.
 
-    >>> cs = CandidateSpec('TestCnd', 'TestCnd.py', 'test_cnd_requirements.txt', 'test_cnd_parameters.txt')
+    >>> cs = CandidateSpec(
+    ...    "TestCnd",
+    ...    "TestCnd.py",
+    ...    "test_cnd_requirements.txt",
+    ...    "test_cnd_parameters.txt",
+    ... )
     >>> cs.name
     'TestCnd'
     >>> cs.candidate_path
@@ -22,8 +27,8 @@
     - data, data set identifier
     - parameters, semicolon-separated hyperparameter string.
 
-    >>> es = ExperimentSettings('test_data', 'a=1;b=2;c=3')
-    >>> es.data
+    >>> es = ExperimentSettings("test_data", "a=1;b=2;c=3")
+    >>> es.dataset_name
     'test_data'
     >>> es.parameters
     'a=1;b=2;c=3'
@@ -55,7 +60,7 @@
     - worker, the worker object.
     - experiment, the experiment object.
 
-    >>> rs = RunSpec('test_worker', 'test_experiment')
+    >>> rs = RunSpec("test_worker", "test_experiment")
     >>> rs.worker
     'test_worker'
     >>> rs.experiment
@@ -87,13 +92,13 @@ def conditional_casting(str_value):
     :param str_value: (string) value to be casted.
     :return: (int, float or string) the casted input value.
 
-    >>> conditional_casting('1')
+    >>> conditional_casting("1")
     1
-    >>> conditional_casting('12a')
+    >>> conditional_casting("12a")
     '12a'
-    >>> conditional_casting('12.0')
+    >>> conditional_casting("12.0")
     12.0
-    >>> conditional_casting('12a.0')
+    >>> conditional_casting("12a.0")
     '12a.0'
     """
     try:

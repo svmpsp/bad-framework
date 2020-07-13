@@ -9,10 +9,8 @@ TEST_DIR ?= tests
 INSTALL_DIR ?= install
 
 SOURCES ?= $(shell find $(PACKAGE_NAME))
-TEST_SOURCES ?= setup.cfg $(shell find tests)
+TEST_SOURCES ?= pytest.ini .flake8 $(shell find tests)
 DOC_SOURCES ?= $(shell find docsrc)
-
-PYTEST_OPTS ?= -vv --black --flake8 --cov=$(PACKAGE_NAME) --cov-fail-under=10
 
 .PHONY: clean help
 
@@ -25,7 +23,7 @@ venv: .python-version
 	-pyenv uninstall -f $(VENV_NAME)
 	pyenv virtualenv $(PYTHON_VERSION) $(VENV_NAME)
 	pyenv local $(VENV_NAME)
-	pip install -U pip
+	pip install -U pip wheel setuptools
 	pip install -r requirements.txt
 	pip install -e .
 	@echo "<<< Done."
@@ -41,9 +39,9 @@ docs: $(DOC_SOURCES) .python-version
 test: .pytest_report
 .pytest_report: $(TEST_SOURCES) $(SOURCES) .python-version
 	@echo ">>> Running tests..."
-	-rm .pytest_report
-	-rm .coverage
-	pytest $(PYTEST_OPTS) && (echo "All is well!" > .pytest_report)
+	-rm -f .pytest_report
+	-rm -f .coverage
+	pytest && (echo "All is well!" > .pytest_report)
 	@echo "<<< Done."
 
 ### - package: packages the project for distribution via PyPI.
@@ -67,7 +65,7 @@ debug: $(SRC_DIR) .pytest_report
 push-test: .pypi_report
 .pypi_report: .python-version .pytest_report dist
 	@echo ">>> Pushing to Test PyPI..."
-	-rm ./.pipy_report
+	-rm -f .pipy_report
 	twine check dist/* && twine upload --repository testpypi dist/* && (echo "Push test was good!" > .pypi_report)
 	@echo "<<< Done."
 
@@ -80,17 +78,17 @@ push: .pypi_report
 ### - clean: cleans project directory.
 clean:
 	@echo ">>> Cleaning project directory..."
-	-rm -rf ./*~  # Removes Emacs backup files
-	-rm .coverage
-	-rm .pytest_report
-	-rm .pypi_report
-	-rm .python-version
-	-pyenv uninstall -f $(VENV_NAME)
+	-rm -f ./*~  # Removes Emacs backup files
+	-rm -f .coverage
+	-rm -f .pytest_report
+	-rm -f .pypi_report
+	-rm -f .python-version
 	-rm -rf $(INSTALL_DIR)
 	-rm -rf build
 	-rm -rf docsrc/_build
 	-rm -rf $(PACKAGE_NAME).egg-info
 	-rm -rf dist
+	-pyenv uninstall -f $(VENV_NAME)
 	@echo "<<< Done."
 
 ### - help: displays this message.

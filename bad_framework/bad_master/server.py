@@ -16,13 +16,14 @@ from .views import (
     SuiteExperimentsHandler,
 )
 
+# Define tornado options
 define(
     "master_home",
     default="/tmp/bad-framework",
     help="Working directory for the master process.",
 )
 define("master_port", default=3290, help="Port for the master process.")
-define("debug", default=False, help="Activate development mode.")
+define("master_debug", default=False, help="Activate development mode.")
 
 # Define our own logging configuration
 logging.basicConfig(
@@ -64,7 +65,7 @@ class BADMasterServer:
                     SuiteExperimentsHandler,
                 ),
             ],
-            debug=options.debug,
+            debug=options.master_debug,
             master_home=home_dir,
             master_port=self._port,
         )

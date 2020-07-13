@@ -12,7 +12,8 @@ def generate_experiments_settings(datasets, parameter_settings):
     and on the parameter configurations.
 
     :param datasets: (list[Dataset]) data sets to be used for the experiments.
-    :param parameter_settings: (dict) a map between parameter names and parameter settings.
+    :param parameter_settings: (dict) a map between parameter names
+    and parameter settings.
     :return: iterable of ExperimentSettings.
     """
     parameter_names = parameter_settings.keys()
@@ -60,9 +61,9 @@ def get_parameter_string(parameters):
     Examples:
 
     >>> get_parameter_string({"a": 10, "b": "hello"})
-    "a=10;b=hello"
+    'a=10;b=hello'
     >>> get_parameter_string({})
-    ""
+    ''
     """
     return ";".join(
         "{key}={value}".format(key=k, value=v) for k, v in parameters.items()
@@ -92,7 +93,8 @@ def install_requirements(requirements_path):
 
 
 def load_data_matrix(path):
-    """Read a data file in ARFF format and returns the numpy matrix corresponding to the data.
+    """Read a data file in ARFF format and returns
+    the numpy matrix corresponding to the data.
 
     Assumes that the first two features of the file are id and outlier label
     respectively.
@@ -113,7 +115,7 @@ def load_parameter_string(parameter_string):
     Examples:
 
     >>> load_parameter_string("a=10;b=hello")
-    {"a": "10", "b": "hello"}
+    {'a': '10', 'b': 'hello'}
     >>> load_parameter_string("")
     {}
     """

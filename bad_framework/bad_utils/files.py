@@ -44,11 +44,45 @@ def get_candidate_file_paths(home_dir, suite_id):
     }
 
 
+def parse_param_line(line):
+    """Parse a line of text specifying a parameter and returns the
+    parsed fields.
+
+    :param line: (string) line of text to parse
+    :return: (list[string]) parameter specification fields.
+    """
+    return re.split(r"\s+", line.strip())
+
+
+def add_value_parameter(parameters, fields):
+    param_name = fields[0]
+    value = conditional_casting(fields[1])
+    parameters[param_name] = ValueParameter(value=value)
+
+
+def add_range_parameter(parameters, fields):
+    param_name = fields[0]
+    start = conditional_casting(fields[1])
+    end = conditional_casting(fields[2])
+    step = conditional_casting(fields[3])
+    param_type = start.__class__.__name__
+    if type(start) == type(end) == type(step) and (
+        param_type == "float" or param_type == "int"
+    ):
+        parameters[param_name] = RangeParameter(start=start, end=end, step=step,)
+    else:
+        raise ValueError(
+            "invalid parameter range for {name}: <{start}, {end}, {step}> ".format(
+                name=param_name, start=start, end=end, step=step,
+            )
+        )
+
+
 def load_parameters(parameter_file, suite):
     """Loads the parameter dictionary from a parameter file.
 
-    The parameter file contains one parameter per line. Each parameter can be either a value parameter
-    or a range parameter, with the following specifications.
+    The parameter file contains one parameter per line. Each parameter can be
+    either a value parameter or a range parameter, with the following specifications.
 
     Value parameter:
     <param_name>  <param_value>
@@ -56,7 +90,8 @@ def load_parameters(parameter_file, suite):
     Range parameter:
     <param_name>  <param_range_start>  <param_range_stop>  <param_range_step>
 
-    NOTE: if the range cannot be divided into an integer number of steps the behavior is undefined.
+    NOTE: if the range cannot be divided into an integer number of steps
+    the behavior is undefined.
 
     :param parameter_file: (string) path to parameter file.
     :param suite: (models.Suite) contains default values for required parameters.
@@ -66,32 +101,15 @@ def load_parameters(parameter_file, suite):
     with open(parameter_file, "r") as parameters_file:
         for line in parameters_file:
             if line.strip() and not line.startswith("#"):
-                fields = re.split(r"\s+", line.strip())
-                param_name = fields[0]
+                fields = parse_param_line(line)
                 num_fields = len(fields)
                 if num_fields == 2:
-                    value = conditional_casting(fields[1])
-                    parameters[param_name] = ValueParameter(value=value)
+                    add_value_parameter(parameters, fields)
                 elif num_fields == 4:
-                    start = conditional_casting(fields[1])
-                    end = conditional_casting(fields[2])
-                    step = conditional_casting(fields[3])
-                    param_type = start.__class__.__name__
-                    if type(start) == type(end) == type(step) and (
-                        param_type == "float" or param_type == "int"
-                    ):
-                        parameters[param_name] = RangeParameter(
-                            start=start, end=end, step=step,
-                        )
-                    else:
-                        raise ValueError(
-                            "invalid range parameter specification. Error on line: {param_line}".format(
-                                param_line=line
-                            )
-                        )
+                    add_range_parameter(parameters, fields)
                 else:
                     raise ValueError(
-                        "formatting error in parameters file. Error on line: {param_line}".format(
+                        "invalid parameter specification at: {param_line}".format(
                             param_line=line
                         )
                     )
@@ -128,7 +146,8 @@ def file_exists_with_content(path, expected_content):
 
     :param path: (string) path to file to check.
     :param expected_content: (bytes) bytes representing the expected content of the file.
-    :return: (bool) True if the file exists and has the expected content, raises a ValueError otherwise.
+    :return: (bool) True if the file exists and has
+    the expected content, raises a ValueError otherwise.
     """
     if not os.path.exists(os.path.dirname(path)):
         raise ValueError("file {} does not exist.".format(path))
@@ -142,14 +161,15 @@ def file_exists_with_content(path, expected_content):
     return True
 
 
-def _get_init_paths():
+def get_init_paths():
     """Returns the list of files that must be present in order to run BAD
     correctly.
 
     :return: (list[string]) list of paths
 
-    >>> paths = _get_init_paths(); paths.sort(); paths
-    ['candidate_parameters.txt', 'candidate_requirements.txt', 'candidates', 'conf']
+    >>> paths = get_init_paths(); paths.sort(); paths
+    ['__init__.py', '__pycache__', 'candidate_parameters.txt', \
+'candidate_requirements.txt', 'candidates', 'conf']
     """
     package_init_dir = "{include_dir}/defaults".format(include_dir=get_include_dir())
     return os.listdir(package_init_dir)
@@ -165,7 +185,7 @@ def delete_bad_files():
     if not cur_dir:
         raise ValueError("invalid directory path {}".format(cur_dir))
 
-    for path in _get_init_paths():
+    for path in get_init_paths():
         absolute_path = os.path.join(cur_dir, path)
         try:
             if os.path.isdir(absolute_path):
@@ -177,12 +197,13 @@ def delete_bad_files():
 
 
 def is_directory_init(cur_dir):
-    """Verifies if the given directory contains the files necessary to run the BAD framework.
+    """Verifies if the given directory contains the files
+    necessary to run the BAD framework.
 
     :param cur_dir: (string) path to current directory
     :return: (bool) True if the directory is already initialized, False otherwise.
     """
-    paths_to_check = _get_init_paths()
+    paths_to_check = get_init_paths()
 
     for path in paths_to_check:
         absolute_path = os.path.join(cur_dir, path)
@@ -192,8 +213,8 @@ def is_directory_init(cur_dir):
 
 
 def init_working_directory(cur_dir):
-    """Initializes the directory with all required files to run
-    the BAD framework. These include all files in the bad_framework/include/defaults directory.
+    """Initializes the directory with all required files to run the BAD framework.
+    These include all files in the bad_framework/include/defaults directory.
     """
 
     # Copy all contents from the package to a temporary dir.

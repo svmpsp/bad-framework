@@ -7,13 +7,14 @@ import tornado.web
 
 from .views import IndexHandler, SetupHandler, RunHandler
 
+# Define tornado options
 define(
     "worker_home",
     default="/tmp/bad-framework",
     help="Working directory for the worker process.",
 )
 define("worker_port", default=3291, help="Port for the worker process.")
-define("debug", default=False, help="Activate development mode.")
+define("worker_debug", default=False, help="Activate development mode.")
 
 # Define our own logging configuration
 logging.basicConfig(
@@ -51,7 +52,7 @@ def main():
     tornado.options.parse_command_line()
 
     bad_worker = BADWorkerServer(
-        options.worker_port, options.worker_home, options.debug
+        options.worker_port, options.worker_home, options.worker_debug
     )
     bad_worker.start()
 

@@ -155,39 +155,6 @@ def handle_command(command, config):
         raise ValueError("invalid command: {}".format(command))
 
 
-def is_config_valid(config, command):
-    """Checks if the the config dictionary contains all settings required to
-    execute command.
-
-    TODO: refactor me!
-
-    If a setting is missing, raises a meaningful error message.
-
-    :param config: (dict) argument dictionary.
-    :param command: (string) command to validate.
-    :return: None
-
-    Examples:
-
-    # >>> is_config_valid({})
-    # Traceback (most recent call last):
-    # ...
-    # ValueError: missing required parameter bad.candidate. Specify it with the '-c' flag, as in:
-    #     bad -c BAD.CANDIDATE
-    """
-    print(command)
-
-    required_args = [("-c", "bad.candidate")]
-    for param, flag in required_args:
-        if param not in config:
-            raise ValueError(
-                """missing required parameter {param_name}. Specify it with the '{flag_name}' flag, as in:
-    bad {flag_name} {upper_param_name}""".format(
-                    param_name=param, flag_name=flag, upper_param_name=param.upper(),
-                )
-            )
-
-
 def _restart_server(config):
     _stop_server(config)
     _start_server(config)
@@ -230,6 +197,6 @@ def get_commands():
 
     Examples:
     >>> cmds = list(get_commands()); cmds.sort(); cmds
-    ['clean', 'ps', 'run', 'server-start', 'server-stop']
+    ['clean', 'ps', 'run', 'server-restart', 'server-start', 'server-stop']
     """
     return bad_commands.keys()
