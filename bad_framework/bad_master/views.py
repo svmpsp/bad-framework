@@ -18,10 +18,6 @@ from bad_framework.bad_utils.files import (
 )
 from .models import Candidate, Dataset, Experiment, Suite, Worker
 
-# TODO: move log to application.settings
-logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)5s - %(message)s", level="INFO"
-)
 log = logging.getLogger("bad.server.master")
 
 
@@ -308,10 +304,11 @@ class SuiteHandler(BaseMasterHandler):
     """Handler for Suite related requests."""
 
     def _save_candidate_files(self, file_paths):
-        """Writes candidate files to disc. The candidate files are multi-part encoded in the
-        request payload.
+        """Writes candidate files to disc. The candidate files are
+        multi-part encoded in the request payload.
 
-        The files are written in the master working directory under the relative suite directory.
+        The files are written in the master working directory under the
+        relative suite directory.
 
         :param file_paths: (dict) paths to candidate files.
         """
@@ -373,9 +370,24 @@ class SuiteHandler(BaseMasterHandler):
         experiment.update_status(ExperimentStatus.SCHEDULED)
         await worker.session.post_json("run/", message)
 
+    @classmethod
+    def _count_running_experiments(cls, experiments):
+        running_experiments = [
+            experiment
+            for experiment in experiments
+            if experiment.status == ExperimentStatus.RUNNING
+        ]
+        return len(running_experiments)
+
+    @classmethod
+    def _get_update_message(cls, running, scheduled, total):
+        return "...{r} ({s}/{t}) running (scheduled/total) experiments.".format(
+            r=running, s=scheduled, t=total,
+        )
+
     async def _start_scheduling_loop(self, experiments, workers):
-        """Starts the experiment scheduling loop. Experiments are scheduled in time in order not
-        to overload the workers.
+        """Starts the experiment scheduling loop. Experiments are scheduled
+        in time in order not to overload the workers.
 
         Each worker runs one experiment at-a-time.
 
@@ -384,7 +396,8 @@ class SuiteHandler(BaseMasterHandler):
          - parameterize sleep interval
 
         :param experiments: (list[models.Experiment]) list of experiments to schedule.
-        :param workers: (list[models.Worker]) list of workers to schedule the experiment on.
+        :param workers: (list[models.Worker]) list of workers to
+        schedule the experiment on.
         """
         workers_num = len(workers)
         experiments_num = len(experiments)
@@ -400,12 +413,8 @@ class SuiteHandler(BaseMasterHandler):
         last_message = ""
 
         while todo_experiments:
-            running_experiments_num = len(
-                [
-                    experiments
-                    for experiment in scheduled_experiments
-                    if experiment.status == ExperimentStatus.RUNNING
-                ]
+            running_experiments_num = self._count_running_experiments(
+                experiments=scheduled_experiments
             )
             if running_experiments_num < workers_num:
                 next_experiment, *todo_experiments = todo_experiments
@@ -415,10 +424,11 @@ class SuiteHandler(BaseMasterHandler):
                 scheduled_experiments.append(next_experiment)
                 worker_index = (worker_index + 1) % workers_num
             scheduled_experiments_num = len(scheduled_experiments)
-            message = "...{running_num} ({scheduled_num}/{total_num}) running (scheduled/total) experiments.".format(
-                running_num=running_experiments_num,
-                scheduled_num=scheduled_experiments_num,
-                total_num=experiments_num,
+
+            message = self._get_update_message(
+                running=running_experiments_num,
+                scheduled=scheduled_experiments_num,
+                total=experiments_num,
             )
             if message != last_message:
                 log.info(message)
@@ -432,11 +442,13 @@ class SuiteHandler(BaseMasterHandler):
 
     @classmethod
     async def _initialize_worker_envs(cls, suite_id, candidate_id, workers, datasets):
-        """Initializes each worker's environment with the dependencies required to run the experiments.
+        """Initializes each worker's environment with the dependencies
+        required to run the experiments.
 
         :param suite_id: (string) suite id.
         :param workers: (list[models.Worker]) list of workers to initialize.
-        :param datasets: (list[models.Dataset]) list of dataset required for the experiments.
+        :param datasets: (list[models.Dataset]) list of datasets required
+        for the experiments.
         """
         for worker in workers:
             log.info("Setting up worker at %s on port %d", worker.hostname, worker.port)
@@ -537,11 +549,11 @@ class SuiteHandler(BaseMasterHandler):
             self.finish()
 
 
-class SuiteExperimentsHandler(BaseMasterHandler):
+class SuiteStatusHandler(BaseMasterHandler):
     """Handler for requests related to suite experiments."""
 
-    def _get_suite_experiments(self, suite_id):
-        """Writes JSON-encoded information on suite experiments to the output stream.
+    def _get_suite_status(self, suite_id):
+        """Writes the JSON-encoded suite status to the output stream.
 
         :param suite_id: (string) suite id.
         """
@@ -560,9 +572,9 @@ class SuiteExperimentsHandler(BaseMasterHandler):
         Returns information on the suite experiments as a JSON-encoded file.
         """
         try:
-            self._get_suite_experiments(suite_id)
+            self._get_suite_status(suite_id)
         except Exception as e:
-            log.error(traceback.format_exc())  # Write on master log
+            log.error(traceback.format_exc())
             self.set_status(500, reason=str(e))
         finally:
             self.flush()

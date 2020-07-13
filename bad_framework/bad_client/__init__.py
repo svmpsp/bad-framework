@@ -4,6 +4,7 @@
 Command-line client for the Benchmarking Anomaly Detection (BAD) framework.
 
  TODO:
+  - suite monitor is blocking
   - implement rescheduling of failed experiments.
   - fix spark candidate in master/index, it does not keep track of old candidates.
   - preliminary repartion Spark candidates to reduce task size.

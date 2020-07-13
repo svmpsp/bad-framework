@@ -18,8 +18,8 @@ def format_status_message(
 
 
 def get_progress_bar(total_length, percentage, item="#", start="[", end="]"):
-    """Builds a progress bar representation, drawn item as base symbol. The bar is delimited by start
-    and end.
+    """Builds a progress bar representation, drawn item as base symbol.
+    The bar is delimited by start and end.
 
     The length of the progress bar is proportional to the percentage with respect to
     the total_length.

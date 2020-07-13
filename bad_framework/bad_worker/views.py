@@ -77,8 +77,8 @@ class SetupHandler(BaseWorkerHandler):
     async def _download_candidate_files(
         cls, master_session, candidate_id, suite_id, base_path
     ):
-        """Downloads candidate source file and its requirements.txt file. Installs the requirements.txt file
-        in the current interpreter.
+        """Downloads candidate source file and its requirements.txt file.
+        Installs the requirements.txt file in the current interpreter.
 
         :param master_session: (bad_utils.network.SessionManager) master session manager
         :param suite_id: (str) suite id

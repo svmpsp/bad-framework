@@ -10,7 +10,8 @@ def start_bad_master(port, debug=False):
     If debug is True, starts the master in development mode.
 
     :param port: (int) port to start the server on.
-    :param debug: (bool) True if master must be started in development mode, False otherwise.
+    :param debug: (bool) True if master must be started in
+    development mode, False otherwise.
     :return: None
     """
     package_bin_dir = "{include_dir}/bin".format(include_dir=get_include_dir())

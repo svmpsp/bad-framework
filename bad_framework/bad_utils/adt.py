@@ -84,6 +84,16 @@ class ExperimentStatus:
     COMPLETED = 3
     FAILED = 4
 
+    @classmethod
+    def valid_statuses(cls):
+        return [
+            "completed",
+            "created",
+            "failed",
+            "running",
+            "scheduled",
+        ]
+
 
 def conditional_casting(str_value):
     """Tries to cast a string value to an integer or float.

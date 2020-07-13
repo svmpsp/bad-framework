@@ -9,7 +9,7 @@ TEST_DIR ?= tests
 INSTALL_DIR ?= install
 
 SOURCES ?= $(shell find $(PACKAGE_NAME))
-TEST_SOURCES ?= pytest.ini .flake8 $(shell find tests)
+TEST_SOURCES ?= pytest.ini $(shell find tests)
 DOC_SOURCES ?= $(shell find docsrc)
 
 .PHONY: clean help
