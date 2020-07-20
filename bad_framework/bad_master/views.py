@@ -447,7 +447,7 @@ class SuiteHandler(BaseMasterHandler):
 
         :param suite_id: (string) suite id.
         :param workers: (list[models.Worker]) list of workers to initialize.
-        :param datasets: (list[models.Dataset]) list of datasets required
+        :param datasets: (list[string]) list of dataset names.
         for the experiments.
         """
         for worker in workers:
@@ -456,7 +456,7 @@ class SuiteHandler(BaseMasterHandler):
                 "master_address": worker.master_address,
                 "suite_id": suite_id,
                 "candidate_id": candidate_id,
-                "datasets": [dataset.name for dataset in datasets],
+                "datasets": datasets,
             }
             response = await worker.session.post_json("setup/", message)
             if response.status_code == 200:
@@ -484,6 +484,7 @@ class SuiteHandler(BaseMasterHandler):
                 datasets = [Dataset.get_by_name(data_name)]
             else:
                 datasets = Dataset.get_all()
+            dataset_names = [dataset.name for dataset in datasets]
             if not Worker.get_all():
                 Worker.setup(workers_list, master_address)
             workers = list(
@@ -493,11 +494,11 @@ class SuiteHandler(BaseMasterHandler):
             experiments = self._generate_suite_experiments(
                 suite=suite,
                 candidate=candidate,
-                datasets=datasets,
+                datasets=dataset_names,
                 parameters=parameters,
             )
             await self._initialize_worker_envs(
-                suite.id, candidate.id, workers, datasets
+                suite.id, candidate.id, workers, dataset_names
             )
 
             # runs scheduling loop in the background

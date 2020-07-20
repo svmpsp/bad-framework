@@ -11,9 +11,9 @@ def generate_experiments_settings(datasets, parameter_settings):
     The total number of experiment settings depends on the number of required data sets
     and on the parameter configurations.
 
-    :param datasets: (list[Dataset]) data sets to be used for the experiments.
+    :param datasets: (list[str]) dataset names to be used for the experiments.
     :param parameter_settings: (dict) a map between parameter names
-    and parameter settings.
+    and parameter values.
     :return: iterable of ExperimentSettings.
     """
     parameter_names = parameter_settings.keys()
@@ -25,15 +25,16 @@ def generate_experiments_settings(datasets, parameter_settings):
         parameter_strings.append(get_parameter_string(parameter_dict))
     for combination in itertools.product(datasets, parameter_strings):
         yield adt.ExperimentSettings(
-            dataset_name=combination[0].name, parameters=combination[1],
+            dataset_name=combination[0], parameters=combination[1],
         )
 
 
 def get_parameter_combinations(parameters):
-    """FIXME: raise meaningful error if range.end < range.start.
+    """Takes a dictionary of parameters and returns all possible parameter combinations.
 
-    :param parameters:
-    :return:
+    :param parameters: (dict) dictionary name -> ValueParameter or RangeParameter.
+    :return: (iterator) N-tuple iterator corresponding to parameter combinations.
+    N is the number of items in parameters.
     """
     distinct_values = []
     for param_name, param in parameters.items():
@@ -48,6 +49,8 @@ def get_parameter_combinations(parameters):
                 )
             ]
             distinct_values.append(value_range)
+        else:
+            raise ValueError("invalid parameter type '{}'".format(param_type))
     # Generate all parameters combinations
     return itertools.product(*distinct_values)
 
@@ -95,9 +98,6 @@ def install_requirements(requirements_path):
 def load_data_matrix(path):
     """Read a data file in ARFF format and returns
     the numpy matrix corresponding to the data.
-
-    Assumes that the first two features of the file are id and outlier label
-    respectively.
 
     :param path: (string) path to data file.
     :return: (numpy.ndarray) data matrix

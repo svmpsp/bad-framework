@@ -63,3 +63,14 @@ def test_update_status_cache():
     }
     update_status_cache(test_experiments, test_cache)
     assert expected_cache == test_cache
+
+
+def test_get_suite_experiments():
+    # example_response = {
+    #     "suite_id": "dummy_suite",
+    #     "experiments": [
+    #         {"id": "dummy_exp_1", "status": "dummy_status_1"},
+    #         {"id": "dummy_exp_2", "status": "dummy_status_2"},
+    #     ],
+    # }
+    pass
