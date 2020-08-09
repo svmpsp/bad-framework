@@ -9,6 +9,7 @@ install_requirements = [
     "Jinja2",
     "matplotlib",
     "numpy",
+    "pyod",
     "requests",
     "scikit-learn",
     "tornado",

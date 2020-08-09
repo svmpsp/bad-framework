@@ -73,9 +73,9 @@ def test_load_default_config(tmp_path):
         ["dummy.path    /config/file/path", "dummy.string  hello", "dummy.value   123"]
     )
     os.chdir(tmp_path)
-    test_conf_dir = tmp_path / "conf"
-    test_conf_dir.mkdir()
-    config_file = test_conf_dir / "defaults.conf"
+    bad_dir = tmp_path / ".bad/"
+    bad_dir.mkdir()
+    config_file = bad_dir / "bad.conf"
     config_file.write_text(config_file_content)
 
     initial_config = {

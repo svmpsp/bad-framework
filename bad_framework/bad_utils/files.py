@@ -4,7 +4,7 @@ import os
 import re
 import shutil
 
-from .adt import conditional_casting, RangeParameter, ValueParameter
+from .adt import conditional_casting
 import bad_framework
 
 logging.basicConfig(
@@ -35,13 +35,17 @@ def get_candidate_name(candidate_path):
     return candidate_name
 
 
-def get_candidate_file_paths(home_dir, suite_id):
-    base_path = "{home_dir}/{suite_id}/".format(home_dir=home_dir, suite_id=suite_id)
-    return {
-        "candidate": base_path + "candidate.py",
-        "parameters": base_path + "parameters.txt",
-        "requirements": base_path + "requirements.txt",
-    }
+def get_candidate_filename(home_dir, suite_id):
+    """Returns a suite-unique filename where to store a local candidate module.
+
+    TODO: refactor, maybe get_local_candidate_filename?
+
+    :param home_dir:
+    :param suite_id:
+    :return:
+    """
+    base_path = os.path.join(home_dir, suite_id)
+    return os.path.join(base_path, "candidate.py")
 
 
 def parse_param_line(line):
@@ -54,13 +58,13 @@ def parse_param_line(line):
     return re.split(r"\s+", line.strip())
 
 
-def add_value_parameter(parameters, fields):
+def parse_value_parameter(fields):
     param_name = fields[0]
     value = conditional_casting(fields[1])
-    parameters[param_name] = ValueParameter(value=value)
+    return param_name, value
 
 
-def add_range_parameter(parameters, fields):
+def parse_range_parameter(fields):
     param_name = fields[0]
     start = conditional_casting(fields[1])
     end = conditional_casting(fields[2])
@@ -69,7 +73,7 @@ def add_range_parameter(parameters, fields):
     if type(start) == type(end) == type(step) and (
         param_type == "float" or param_type == "int"
     ):
-        parameters[param_name] = RangeParameter(start=start, end=end, step=step,)
+        return param_name, start, end, step
     else:
         raise ValueError(
             "invalid parameter range for {name}: <{start}, {end}, {step}> ".format(
@@ -78,53 +82,41 @@ def add_range_parameter(parameters, fields):
         )
 
 
-def load_parameters(parameter_file, suite):
-    """Loads the parameter dictionary from a parameter file.
+def parse_requirements(requirements_filename):
+    requirements = []
+    with open(requirements_filename, "r") as requirements_file:
+        for line in requirements_file:
+            # Remove whitespaces, line and inline comments
+            requirement = line.split("#")[0].strip()
+            if requirement:
+                requirements.append(requirement)
+    requirements.sort()
+    return requirements
 
-    The parameter file contains one parameter per line. Each parameter can be
-    either a value parameter or a range parameter, with the following specifications.
 
-    Value parameter:
-    <param_name>  <param_value>
-
-    Range parameter:
-    <param_name>  <param_range_start>  <param_range_stop>  <param_range_step>
-
-    NOTE: if the range cannot be divided into an integer number of steps
-    the behavior is undefined.
-
-    :param parameter_file: (string) path to parameter file.
-    :param suite: (models.Suite) contains default values for required parameters.
-    :return: (dict) parameter dictionary
-    """
-    parameters = {}
-    with open(parameter_file, "r") as parameters_file:
+def parse_parameters(parameters_filename):
+    parameters = []
+    with open(parameters_filename, "r") as parameters_file:
         for line in parameters_file:
-            if line.strip() and not line.startswith("#"):
-                fields = parse_param_line(line)
+            line = line.split("#")[0].strip()
+            if line:
+                fields = re.split(r"\s+", line)
                 num_fields = len(fields)
                 if num_fields == 2:
-                    add_value_parameter(parameters, fields)
+                    parameters.append(parse_value_parameter(fields))
                 elif num_fields == 4:
-                    add_range_parameter(parameters, fields)
+                    parameters.append(parse_range_parameter(fields))
                 else:
                     raise ValueError(
                         "invalid parameter specification at: {param_line}".format(
                             param_line=line
                         )
                     )
-    # Add default values for required parameters
-    if "seed" not in parameters:
-        parameters["seed"] = ValueParameter(value=suite.seed)
-    if "trainset_size" not in parameters:
-        parameters["trainset_size"] = ValueParameter(value=suite.trainset_size)
     return parameters
 
 
 def get_include_dir():
-    return "{package_file}/include".format(
-        package_file=os.path.dirname(bad_framework.__file__)
-    )
+    return os.path.join(os.path.dirname(bad_framework.__file__), "include")
 
 
 def save_file(content, path):
@@ -168,11 +160,15 @@ def get_init_paths():
     :return: (list[string]) list of paths
 
     >>> paths = get_init_paths(); paths.sort(); paths
-    ['__init__.py', '__pycache__', 'candidate_parameters.txt', \
-'candidate_requirements.txt', 'candidates', 'conf']
+    ['bad.conf', 'candidate_parameters.txt', 'candidate_requirements.txt', 'workers']
     """
-    package_init_dir = "{include_dir}/defaults".format(include_dir=get_include_dir())
-    return os.listdir(package_init_dir)
+    package_init_dir = os.path.join(get_include_dir(), "defaults")
+    raw_files = os.listdir(package_init_dir)
+    exclude_files = [
+        "__init__.py",
+        "__pycache__",
+    ]
+    return [file for file in raw_files if file not in exclude_files]
 
 
 def delete_bad_files():
@@ -196,29 +192,13 @@ def delete_bad_files():
             log.debug("cannot remove file: %s", str(fnfe))
 
 
-def is_directory_init(cur_dir):
-    """Verifies if the given directory contains the files
-    necessary to run the BAD framework.
-
-    :param cur_dir: (string) path to current directory
-    :return: (bool) True if the directory is already initialized, False otherwise.
-    """
-    paths_to_check = get_init_paths()
-
-    for path in paths_to_check:
-        absolute_path = os.path.join(cur_dir, path)
-        if not os.path.exists(absolute_path):
-            return False
-    return True
-
-
-def init_working_directory(cur_dir):
+def copy_files_to_bad_directory(dest_dir):
     """Initializes the directory with all required files to run the BAD framework.
     These include all files in the bad_framework/include/defaults directory.
     """
 
     # Copy all contents from the package to a temporary dir.
-    src_dir_path = "{include_dir}/defaults".format(include_dir=get_include_dir())
+    src_dir_path = os.path.join(get_include_dir(), "defaults")
 
     with TemporaryDirectory() as temp_dir:
         dest_dir_path = os.path.join(temp_dir, "buffer_dir")
@@ -226,11 +206,11 @@ def init_working_directory(cur_dir):
         shutil.copytree(src_dir_path, dest_dir_path)
 
         # Copy all contents of the temporary directory to the current directory
-        for relative_path in os.listdir(dest_dir_path):
+        for relative_path in get_init_paths():
             absolute_src = os.path.join(dest_dir_path, relative_path)
             if os.path.isfile(absolute_src):
-                shutil.copy(absolute_src, cur_dir)
+                shutil.copy(absolute_src, dest_dir)
             elif os.path.isdir(absolute_src):
-                shutil.copytree(absolute_src, os.path.join(cur_dir, relative_path))
+                shutil.copytree(absolute_src, os.path.join(dest_dir, relative_path))
             else:
                 raise ValueError("neither a file nor a directory.")

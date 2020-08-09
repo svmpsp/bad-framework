@@ -33,17 +33,17 @@ class Candidate(Model):
 
     _objects = {}
 
-    def __init__(self, suite_id, file_paths):
+    def __init__(self, suite_id, source_filename, parameters, requirements):
         self.id = self._get_id("candidate")
         self.suite = suite_id
-        self.name = get_candidate_name(file_paths["candidate"])
-        self.parameters = file_paths["parameters"]
-        self.requirements = file_paths["requirements"]
-        self.source = file_paths["candidate"]
+        self.name = get_candidate_name(source_filename)
+        self.source = source_filename
+        self.parameters = parameters
+        self.requirements = requirements
 
     @classmethod
-    def create(cls, suite_id, file_paths):
-        new_candidate = Candidate(suite_id, file_paths)
+    def create(cls, suite_id, source_filename, parameters, requirements):
+        new_candidate = Candidate(suite_id, source_filename, parameters, requirements)
         cls._objects[new_candidate.id] = new_candidate
         return new_candidate
 
@@ -145,14 +145,12 @@ class Suite(Model):
 
     _objects = {}
 
-    def __init__(self, seed, trainset_size):
+    def __init__(self):
         self.id = self._get_id("suite")
-        self.seed = seed
-        self.trainset_size = trainset_size
 
     @classmethod
-    def create(cls, seed, trainset_size):
-        new_suite = Suite(seed, trainset_size)
+    def create(cls):
+        new_suite = Suite()
         cls._objects[new_suite.id] = new_suite
         return new_suite
 

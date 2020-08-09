@@ -8,19 +8,13 @@
     - parameters_path, path to Candidate parameters file.
 
     >>> cs = CandidateSpec(
-    ...    "TestCnd",
-    ...    "TestCnd.py",
-    ...    "test_cnd_requirements.txt",
-    ...    "test_cnd_parameters.txt",
+    ...    "local",
+    ...    "DummyCandidate.py",
     ... )
-    >>> cs.name
-    'TestCnd'
-    >>> cs.candidate_path
-    'TestCnd.py'
-    >>> cs.requirements_path
-    'test_cnd_requirements.txt'
-    >>> cs.parameters_path
-    'test_cnd_parameters.txt'
+    >>> cs.source
+    'local'
+    >>> cs.url
+    'DummyCandidate.py'
 
     ExperimentSettings: represents the specification of an experiment.
     ExperimentSettings fields are:
@@ -68,9 +62,7 @@
 """
 from collections import namedtuple
 
-CandidateSpec = namedtuple(
-    "CandidateSpec", "name candidate_path requirements_path parameters_path"
-)
+CandidateSpec = namedtuple("CandidateSpec", "source url")
 ExperimentSettings = namedtuple("ExperimentSettings", "dataset_name parameters")
 ValueParameter = namedtuple("ValueParameter", "value")
 RangeParameter = namedtuple("RangeParameter", "start end step")

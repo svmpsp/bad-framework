@@ -84,15 +84,13 @@ def init_worker_environments(workers, suite_id, candidate_id, datasets):
         worker.session.post_json("setup/", message)
 
 
-def install_requirements(requirements_path):
+def install_requirements(requirements):
     """Installs a requirements.txt file using the pip defined in the current interpreter.
 
-    :param requirements_path: (string) path to requirement file.
+    :param requirements: (list[string]) list of pip requirement specifiers.
     :return: None
     """
-    subprocess.check_call(
-        [sys.executable, "-m", "pip", "install", "-r", requirements_path]
-    )
+    subprocess.check_call([sys.executable, "-m", "pip", "install", *requirements])
 
 
 def load_data_matrix(path):

@@ -8,12 +8,14 @@ class KNN:
      "Efficient algorithms for mining outliers from large data sets."
      ACM Sigmod Record. Vol. 29. No. 2. ACM, 2000.
 
-     This method assigns an outlier score to each data elements corresponding to the distance with its
-     k-th nearest neighbor.
+     This method assigns an outlier score to each data elements
+     corresponding to the distance with its k-th nearest
+     neighbor.
 
-    Parameters:
-    - k: (int) number of neighbors to consider (defaults to 10). Must be smaller than the data set size.
-    - seed: (int) random number generator seed.
+     Parameters:
+     - k: (int) number of neighbors to consider (defaults to 10). Must
+     be smaller than the data set size.
+     - seed: (int) random number generator seed.
     """
 
     def __init__(self, **kwargs):

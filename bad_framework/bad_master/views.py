@@ -2,18 +2,27 @@
 import json
 import logging
 import os
-import time
 import traceback
 
 from jinja2 import Environment, PackageLoader
 from tornado.ioloop import IOLoop
 import tornado.web
 
+from bad_framework.bad_candidates import (
+    get_candidate_requirements,
+    get_default_candidate,
+)
 from bad_framework.bad_utils import generate_experiments_settings, load_parameter_string
-from bad_framework.bad_utils.adt import ExperimentStatus
+from bad_framework.bad_utils.adt import (
+    CandidateSpec,
+    ExperimentStatus,
+    RangeParameter,
+    ValueParameter,
+)
+from bad_framework.bad_utils.errors import get_response_message, get_error_message
 from bad_framework.bad_utils.files import (
-    get_candidate_file_paths,
-    load_parameters,
+    get_candidate_filename,
+    get_include_dir,
     save_file,
 )
 from .models import Candidate, Dataset, Experiment, Suite, Worker
@@ -94,16 +103,8 @@ class CandidateHandler(BaseMasterHandler):
         """
         candidate = Candidate.get_by_id(candidate_id)
         with open(candidate.source, "rb") as candidate_file:
-            self.write(candidate_file.read())
-
-    def _get_requirements_file(self, candidate_id):
-        """Writes the requirements.txt file contents to the output stream.
-
-        :param candidate_id: (string) candidate id.
-        """
-        candidate = Candidate.get_by_id(candidate_id)
-        with open(candidate.requirements, "rb") as requirement_file:
-            self.write(requirement_file.read())
+            content = candidate_file.read()
+        return content
 
     def get(self, candidate_id):
         """Handler for HTTP GET method.
@@ -111,16 +112,19 @@ class CandidateHandler(BaseMasterHandler):
         Returns candidate files depending on the requested path.
         """
         try:
-            if "requirements" in self.request.path:
-                self._get_requirements_file(candidate_id)
-            else:
-                self._get_candidate_file(candidate_id)
+            # if "requirements" in self.request.path:
+            #     self._get_requirements_file(candidate_id)
+            # else:
+            response_content = self._get_candidate_file(candidate_id)
+            self.write(response_content)
             self.set_status(200)
         except Exception as e:
-            log.error(traceback.format_exc())  # Write on master log
-            self.set_status(status_code=500, reason=str(e))
+            log.error(traceback.format_exc())
+            message = get_error_message(reason=str(e))
+            self.write(message)
         finally:
             self.flush()
+            self.finish()
 
 
 class DatasetHandler(BaseMasterHandler):
@@ -307,6 +311,9 @@ class SuiteHandler(BaseMasterHandler):
         """Writes candidate files to disc. The candidate files are
         multi-part encoded in the request payload.
 
+        TODO:
+         - refactor to remove files
+
         The files are written in the master working directory under the
         relative suite directory.
 
@@ -320,17 +327,6 @@ class SuiteHandler(BaseMasterHandler):
         save_file(
             self.get_file_contents("candidate_parameters"), file_paths["parameters"]
         )
-
-    def _create_candidate(self, suite_id):
-        """Creates a new candidate.
-
-        :param suite_id: (string) suite id.
-        :return: (models.Candidate) created candidate.
-        """
-        file_paths = get_candidate_file_paths(self.get_wd(), suite_id)
-        self._save_candidate_files(file_paths)
-        candidate = Candidate.create(suite_id, file_paths)
-        return candidate
 
     @classmethod
     def _generate_suite_experiments(cls, suite, candidate, parameters, datasets):
@@ -410,7 +406,6 @@ class SuiteHandler(BaseMasterHandler):
         todo_experiments = experiments
         worker_index = 0
         scheduled_experiments_num = 0
-        last_message = ""
 
         while todo_experiments:
             running_experiments_num = self._count_running_experiments(
@@ -424,16 +419,6 @@ class SuiteHandler(BaseMasterHandler):
                 scheduled_experiments.append(next_experiment)
                 worker_index = (worker_index + 1) % workers_num
             scheduled_experiments_num = len(scheduled_experiments)
-
-            message = self._get_update_message(
-                running=running_experiments_num,
-                scheduled=scheduled_experiments_num,
-                total=experiments_num,
-            )
-            if message != last_message:
-                log.info(message)
-                last_message = message
-            time.sleep(0.25)
         log.info(
             "<<< Scheduling loop completed (%d/%d).",
             scheduled_experiments_num,
@@ -441,7 +426,7 @@ class SuiteHandler(BaseMasterHandler):
         )
 
     @classmethod
-    async def _initialize_worker_envs(cls, suite_id, candidate_id, workers, datasets):
+    async def _initialize_worker_envs(cls, suite_id, candidate, workers, datasets):
         """Initializes each worker's environment with the dependencies
         required to run the experiments.
 
@@ -455,7 +440,8 @@ class SuiteHandler(BaseMasterHandler):
             message = {
                 "master_address": worker.master_address,
                 "suite_id": suite_id,
-                "candidate_id": candidate_id,
+                "candidate_id": candidate.id,
+                "requirements": candidate.requirements,
                 "datasets": datasets,
             }
             response = await worker.session.post_json("setup/", message)
@@ -464,6 +450,52 @@ class SuiteHandler(BaseMasterHandler):
             else:
                 raise ValueError("worker initialization failed: ", response.reason)
 
+    def _load_candidate(self, candidate_name):
+        candidate_dir = os.path.join(get_include_dir(), "candidates")
+        candidate_file = os.path.join(candidate_dir, candidate_name + ".py")
+
+        if not os.path.exists(candidate_file):
+            raise ValueError("candidate '{}' does not exists.".format(candidate_name))
+
+        # Copy candidate files to suite directory, return candidate object
+        raise NotImplementedError()
+
+    def _get_candidate(self, suite_id, message):
+        candidate_spec = CandidateSpec(*message["candidate"])
+
+        parameters = self._load_parameters_list(message["candidate_parameters"])
+
+        if candidate_spec.source == "local":
+            candidate_src = self.get_file_contents("candidate_source")
+            requirements = message["candidate_requirements"]
+            candidate_filename = get_candidate_filename(self.get_wd(), suite_id)
+            save_file(candidate_src, candidate_filename)
+        else:
+            candidate_name = candidate_spec.url
+            candidate_filename = get_default_candidate(candidate_name)
+            requirements = get_candidate_requirements(candidate_name)
+        return Candidate.create(
+            suite_id=suite_id,
+            source_filename=candidate_filename,
+            parameters=parameters,
+            requirements=requirements,
+        )
+
+    def _load_parameters_list(self, parameters_list):
+        parameters = {}
+        for param_tuple in parameters_list:
+            if len(param_tuple) == 2:
+                param_name, param_value = param_tuple
+                parameters[param_name] = ValueParameter(param_value)
+            elif len(param_tuple) == 4:
+                param_name, start, end, step = param_tuple
+                parameters[param_name] = RangeParameter(start, end, step)
+            else:
+                raise ValueError(
+                    "invalid parameter specification: '{}'".format(param_tuple)
+                )
+        return parameters
+
     async def post(self):
         """Handler for HTTP POST method.
 
@@ -471,13 +503,11 @@ class SuiteHandler(BaseMasterHandler):
         """
         try:
             message = json.loads(self.get_file_contents("suite_settings"))
-            seed = message["seed"]
-            trainset_size = message["trainset_size"]
             data_name = message["data"]
             master_address = message["master_address"]
             workers_list = message["workers"]
-            suite = Suite.create(seed, trainset_size)
-            candidate = self._create_candidate(suite.id)
+            suite = Suite.create()
+            candidate = self._get_candidate(suite.id, message)
             if not Dataset.get_all():
                 Dataset.setup()
             if data_name:
@@ -490,15 +520,14 @@ class SuiteHandler(BaseMasterHandler):
             workers = list(
                 Worker.get_all()  # this returns a non-subscriptable set-like
             )
-            parameters = load_parameters(candidate.parameters, suite)
             experiments = self._generate_suite_experiments(
                 suite=suite,
                 candidate=candidate,
                 datasets=dataset_names,
-                parameters=parameters,
+                parameters=candidate.parameters,
             )
             await self._initialize_worker_envs(
-                suite.id, candidate.id, workers, dataset_names
+                suite.id, candidate, workers, dataset_names
             )
 
             # runs scheduling loop in the background
@@ -508,12 +537,13 @@ class SuiteHandler(BaseMasterHandler):
                 workers=workers,
             )
 
-            message = {"suite_id": suite.id}
-            self.write(message)
+            message = get_response_message(status=200, payload={"suite_id": suite.id})
             self.set_status(200)
+            self.write(message)
         except Exception as e:
             log.error(traceback.format_exc())
-            self.set_status(500, reason=str(e))
+            message = get_error_message(reason=str(e))
+            self.write(message)
         finally:
             await self.finish()
 

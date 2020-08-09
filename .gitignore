@@ -10,4 +10,5 @@ dist
 docs/.buildinfo
 docsrc/_build
 venv-bad-framework
+TODO.md
 *~

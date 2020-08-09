@@ -5,6 +5,7 @@ Command-line client for the Benchmarking Anomaly Detection (BAD) framework.
 
  TODO:
   - suite monitor is blocking
+  - move candidate requirements and parameters parsing to client, no need to send files.
   - implement rescheduling of failed experiments.
   - fix spark candidate in master/index, it does not keep track of old candidates.
   - preliminary repartion Spark candidates to reduce task size.
@@ -20,14 +21,13 @@ import os
 import re
 import sys
 
-from bad_framework.bad_utils.files import init_working_directory, is_directory_init
+from bad_framework.bad_utils.files import copy_files_to_bad_directory
+from bad_framework.bad_utils.magic import BAD_CONF_DIR, LOG_FORMAT
 
 from .cli import get_commands, handle_command
 
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)5s - %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
+    level=logging.INFO, format=LOG_FORMAT, datefmt="%Y-%m-%d %H:%M:%S",
 )
 log = logging.getLogger("bad.client")
 
@@ -67,7 +67,7 @@ def load_default_config(runtime_config):
     :param runtime_config: (dict) runtime configuration.
     :return: (dict) updated runtime configuration.
     """
-    default_config_path = os.path.join(os.getcwd(), "conf/defaults.conf",)
+    default_config_path = os.path.join(os.getcwd(), BAD_CONF_DIR)
     if os.path.exists(default_config_path):
         loaded_settings = parse_config_file(default_config_path)
         runtime_config = add_settings(runtime_config, loaded_settings)
@@ -149,16 +149,21 @@ def print_config(config):
     log.debug("}")
 
 
+def initialize_bad_directory():
+    cwd = os.getcwd()
+    bad_dir = os.path.join(cwd, ".bad")
+    if not os.path.exists(bad_dir):
+        os.mkdir(bad_dir)
+        copy_files_to_bad_directory(bad_dir)
+
+
 def main():
     config = parse_arguments()
 
     if config["bad.log.verbose"]:
         log.setLevel("DEBUG")
 
-    cwd = os.getcwd()
-
-    if not is_directory_init(cwd):
-        init_working_directory(cwd)
+    initialize_bad_directory()
 
     config = load_default_config(config)
 

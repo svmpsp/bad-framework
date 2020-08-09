@@ -1,15 +1,18 @@
+import json
+import importlib.util
+import logging
+import os
+import traceback
+
 from sklearn.metrics import (
     average_precision_score,
     roc_auc_score,
     roc_curve,
 )
-import json
-import importlib.util
-import logging
+import jinja2 as j2
 import matplotlib.pyplot as plt
 import numpy as np
-import os
-import traceback
+import tornado.web
 
 from bad_framework.bad_utils import (
     install_requirements,
@@ -18,13 +21,10 @@ from bad_framework.bad_utils import (
 )
 from bad_framework.bad_utils.adt import ExperimentStatus
 from bad_framework.bad_utils.files import get_candidate_name
+from bad_framework.bad_utils.magic import LOG_FORMAT
 from bad_framework.bad_utils.network import AsyncHTTPSessionManager
-import jinja2 as j2
-import tornado.web
 
-logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)5s - %(message)s", level="INFO"
-)
+logging.basicConfig(format=LOG_FORMAT, level="INFO")
 log = logging.getLogger("bad.server.worker")
 
 
@@ -61,15 +61,19 @@ class SetupHandler(BaseWorkerHandler):
     async def _setup_worker(self):
         log.info(">>> Setting up worker")
         message = json.loads(self.request.body)
-        master_address = message["master_address"]
+
         candidate_id = message["candidate_id"]
-        suite_id = message["suite_id"]
         datasets = message["datasets"]
+        master_address = message["master_address"]
+        requirements = message["requirements"]
+        suite_id = message["suite_id"]
+
         base_path = self.get_wd()
         master_session = AsyncHTTPSessionManager(master_address)
         await self._download_candidate_files(
             master_session, candidate_id, suite_id, base_path
         )
+        install_requirements(requirements)
         await self._download_datasets(master_session, base_path, datasets)
         log.info("<<< Done.")
 
@@ -92,19 +96,6 @@ class SetupHandler(BaseWorkerHandler):
                 home_dir=base_path, suite_id=suite_id
             ),
         )
-        log.info("Downloading requirements file...")
-        requirements_path = "{home_dir}/{suite_id}/requirements.txt".format(
-            home_dir=base_path, suite_id=suite_id
-        )
-        await master_session.download_file(
-            url="candidate/{candidate_id}/requirements/".format(
-                candidate_id=candidate_id
-            ),
-            path=requirements_path,
-        )
-        log.info("Installing candidate requirements...")
-        install_requirements(requirements_path)
-        log.info("Requirements installed.")
 
     @classmethod
     async def _download_datasets(cls, master_session, base_path, datasets):
