@@ -13,7 +13,7 @@ CANDIDATE_FILES = {
 CANDIDATE_REQUIREMENTS = {
     "dummy": ["numpy"],
     "fb": ["pyod"],
-    "iforest": ["numpy", "scikit-learn"],
+    "iforest": ["scikit-learn"],
     "knn": ["scikit-learn"],
     "loci": ["numpy", "pyod"],
     "lof": ["numpy", "scikit-learn"],
