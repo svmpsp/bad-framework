@@ -2,10 +2,12 @@ import numpy as np
 
 
 class Dummy:
-    """Random anomaly detector. Classify data elements as anomalies with probability p.
+    """Random anomaly detector. Assigns score 1.0 (a.k.a anomalous) to data elements at
+    random with probability p.
 
     Parameters:
-    - p: (float) probability of assigning the anomalous score. Must be between [0.0, 1.0].
+    - p: (float) probability of classifying an element as
+    anomalous (must be between 0.0 and 1.0).
     - seed: (int) random number generator seed.
     """
 
@@ -14,9 +16,19 @@ class Dummy:
         np.random.seed(int(kwargs["seed"]))
 
     def fit(self, train_data):
+        """No fitting required.
+
+        :param train_data: (numpy.ndarray) training dataset (ignored).
+        :return: (bad.Candidate) the trained model.
+        """
         return self
 
     def score(self, element):
+        """Classifies element as anomalous with probability p.
+
+        :param element: (numpy.ndarray) data element as a row vector (ignored).
+        :return: (float) anomaly score for element.
+        """
         random_number = np.random.uniform()
         if random_number >= 1.0 - self.p:
             return 1.0

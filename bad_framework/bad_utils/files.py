@@ -165,7 +165,6 @@ def get_init_paths():
     package_init_dir = os.path.join(get_include_dir(), "defaults")
     raw_files = os.listdir(package_init_dir)
     exclude_files = [
-        "__init__.py",
         "__pycache__",
     ]
     return [file for file in raw_files if file not in exclude_files]

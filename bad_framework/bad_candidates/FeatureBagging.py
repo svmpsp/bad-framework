@@ -1,22 +1,21 @@
-import numpy as np
 from pyod.models.feature_bagging import FeatureBagging as FB
 
 
 class FeatureBagging:
-    """Implements the FeatureBagging method proposed in
+    """Implements the Feature Bagging (FB) method proposed in:
 
     Lazarevic, Aleksandar, and Vipin Kumar.
     "Feature bagging for outlier detection."
     Proceedings of the eleventh ACM SIGKDD international conference
     on Knowledge discovery in data mining. ACM, 2005.
 
-    The method works as an ensemble of weak detectors. The base detector is the
-    Local Outlier Factor algorithm. FeatureBagging selects random subspaces within
-    the full feature set and applies the base detector on each subspace.
+    The method works as an ensemble of weak detectors. This implementation uses the
+    Local Outlier Factor algorithm as base detector. FeatureBagging selects random
+    subspaces within the full feature set and applies the base detector on each subspace.
     It then combines the resulting outlier scores using the combination function.
 
     This class wraps the implementation provided by the pyod library
-    (https://pyod.readthedocs.io/en/latest/pyod.models.html#module-pyod.models.feature_bagging)  # noqa 501
+    (see https://pyod.readthedocs.io/en/latest/pyod.models.html#module-pyod.models.feature_bagging)  # noqa 501
 
     Parameters:
     :combination: (string) either 'average' or 'max' (defaults to 'average').
@@ -33,26 +32,20 @@ class FeatureBagging:
         self.m = int(kwargs.get("m", 10))
         self.max_features = float(kwargs.get("max_features", 1.0))
         self.seed = int(kwargs["seed"])
+        self._model = None
 
     def fit(self, train_data):
-        raise NotImplementedError()
+        self._model = FB(
+            n_estimators=self.m,
+            max_features=self.max_features,
+            random_state=self.seed,
+            combination=self.combination,
+            estimator_params=self.estimator_params,
+        ).fit(train_data)
+        return self
 
     def score(self, element):
-        print(np)
-        print(FB)
-        raise NotImplementedError()
-
-    # def score(self, data_matrix):
-    #
-    #     feature_bagging_model = FB(
-    #         n_estimators=self.m,
-    #         max_features=self.max_features,
-    #         random_state=self.seed,
-    #         combination=self.combination,
-    #         estimator_params=self.estimator_params,
-    #     ).fit(data_matrix)
-    #
-    #     scores = feature_bagging_model.decision_scores_.reshape(
-    #         (data_matrix.shape[0], 1)
-    #     )
-    #     return np.concatenate((data_matrix, scores), axis=1,)
+        if not self._model:
+            raise ValueError("invalid state. The model has not been trained.")
+        element = element.reshape(1, -1)
+        return self._model.decision_function(element)[0]

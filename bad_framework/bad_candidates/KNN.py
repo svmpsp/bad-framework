@@ -31,7 +31,7 @@ class KNN:
         if not self._model:
             raise ValueError("invalid state. The model has not been trained.")
 
-        element = element.reshape(1, -1)  # element has 1D, kneighbors() requires 2D
+        element = element.reshape(1, -1)
         neighbor_distances, _ = self._model.kneighbors(
             element
         )  # neighbor_distances has shape (1, k)
