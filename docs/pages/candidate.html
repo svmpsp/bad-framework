@@ -91,7 +91,6 @@
 <li class="toctree-l2"><a class="reference internal" href="#the-score-method">The score method</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#candidate-class-definition">Candidate class definition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#candidate-initialization">Candidate initialization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#contributing-candidates">Contributing Candidates</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="parameters.html">Hyper-parameter tuning</a></li>
@@ -163,50 +162,42 @@
   <div class="section" id="algorithms">
 <span id="pages-candidate"></span><h1>Algorithms<a class="headerlink" href="#algorithms" title="Permalink to this headline">¶</a></h1>
 <p>A Candidate is the abstraction representing an unsupervised anomaly
-detection algorithm in the BAD framework.</p>
-<p>In practice, a Candidate is a python module implementing an anomaly
+detection algorithm in the <strong>BAD</strong> framework.</p>
+<p>In practice, a Candidate is a Python module implementing an anomaly
 detection technique.</p>
 <p>The Candidate API defines the characteristics of a Candidate module.</p>
 <div class="section" id="the-score-method">
 <h2>The score method<a class="headerlink" href="#the-score-method" title="Permalink to this headline">¶</a></h2>
-<p>A Candidate must implement the <strong>score</strong> method, with the following
-signature:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_matrix</span><span class="p">):</span>
+<p>A Candidate must implement both the <strong>fit()</strong> and <strong>score()</strong> methods</p>
+<p>The <strong>fit()</strong> method must have the following signature:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">train_data</span><span class="p">):</span>
 
-    <span class="c1"># Compute outlier scores ...</span>
+    <span class="c1"># Perform model fitting ...</span>
 
-    <span class="k">return</span> <span class="n">score_matrix</span>
+    <span class="k">return</span> <span class="bp">self</span>
 </pre></div>
 </div>
-<p>The <strong>data_matrix</strong> parameter represents the data set to be
-analyzed. It is represented as a 2-dimensional <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html">numpy array</a>
+<p>The <strong>train_data</strong> parameter represents the training dataset. It is represented as a
+2-dimensional
+<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html">numpy array</a>
 of float with shape <em>N X D</em>.</p>
-<p>The <strong>score_matrix</strong> variable represents the output of the
-algorithm. It should be a 2-dimensional <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html">numpy array</a>
-of float with shape <em>N X (D+1)</em>.  The additional column corresponds to
-the score for each element.</p>
-<p>As an example, when analyzing a data set with 100 data elements and 4
-dimensions, BAD will enforce that:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data_matrix</span><span class="o">.</span><span class="n">shape</span>
-<span class="go">(100, 4)</span>
+<p>The <strong>fit()</strong> method returns the fitted Candidate.</p>
+<p>The <strong>score()</strong> method must have the following signature:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">):</span>
+
+    <span class="c1"># Compute score for data element ...</span>
+
+    <span class="k">return</span> <span class="n">score</span>
 </pre></div>
 </div>
-<p>While the Candidate code must enforce that:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">score_matrix</span><span class="o">.</span><span class="n">shape</span>
-<span class="go">(100, 5)</span>
-</pre></div>
-</div>
+<p>The <strong>element</strong> parameter represents a data element as a row vector.</p>
 </div>
 <div class="section" id="candidate-class-definition">
 <h2>Candidate class definition<a class="headerlink" href="#candidate-class-definition" title="Permalink to this headline">¶</a></h2>
-<p>The <strong>score</strong> method must be implemented as part of a class. The class
-implementing the <strong>score</strong> method is called the <em>Candidate class</em>.</p>
-<p>The Candidate class must be the <strong>first class</strong> (in order) defined in
-the candidate module. The name of the Candidate class is used by the
-BAD framework as an identifier.</p>
-<p>There is no limit on the number of classes that can be defined in the
-Candidate module, however the first class found in the module must
-represent a Candidate, i.e. it must implement the score method.</p>
+<p>The <strong>fit</strong> and <strong>score</strong> methods must be implemented as a Python class.
+This class is known as the <em>Candidate class</em>.</p>
+<p>The Candidate class must be the <em>first class</em> (in order) defined in
+the Candidate module.</p>
 </div>
 <div class="section" id="candidate-initialization">
 <h2>Candidate initialization<a class="headerlink" href="#candidate-initialization" title="Permalink to this headline">¶</a></h2>
@@ -226,10 +217,6 @@ signature.</p>
 <p>The special key <em>seed</em> is always provided by the framework to be used
 as an RNG seed for replicable experiments. You can override the seed
 in the Candidate parameters file.</p>
-</div>
-<div class="section" id="contributing-candidates">
-<h2>Contributing Candidates<a class="headerlink" href="#contributing-candidates" title="Permalink to this headline">¶</a></h2>
-<p>TODO</p>
 </div>
 </div>
 

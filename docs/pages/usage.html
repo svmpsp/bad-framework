@@ -162,13 +162,13 @@
 <span id="pages-usage"></span><h1>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h1>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>usage: bad <span class="o">[</span>-h<span class="o">]</span> <span class="o">[</span>-c BAD.CANDIDATE<span class="o">]</span> <span class="o">[</span>-d BAD.DATA<span class="o">]</span> <span class="o">[</span>-o BAD.DUMP.FILE<span class="o">]</span>
            <span class="o">[</span>-p BAD.CANDIDATE.PARAMETERS<span class="o">]</span> <span class="o">[</span>-q BAD.CANDIDATE.REQUIREMENTS<span class="o">]</span> <span class="o">[</span>-v<span class="o">]</span>
-           <span class="o">[{</span>init,server-start,server-stop<span class="o">}]</span>
+           <span class="o">[{</span>run,server-start,server-stop<span class="o">}]</span>
 </pre></div>
 </div>
 <p>The BAD CLI is the main client provided with the BAD framework. It enables users to control BAD processes and run experiments on the framework.</p>
 <div class="section" id="basic-commands">
 <h2>Basic commands<a class="headerlink" href="#basic-commands" title="Permalink to this headline">¶</a></h2>
-<p>Commands are used to manage the BAD framework, all available commands are described in Table XXX.</p>
+<p>Commands are used to manage the BAD framework, all available commands are described in the following table.</p>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 11%" />
@@ -180,14 +180,14 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>init</p></td>
-<td><p>Initializes BAD configuration files in current directory</p></td>
+<tr class="row-even"><td><p>run</p></td>
+<td><p>Runs a suite of anomaly detection experiments.</p></td>
 </tr>
 <tr class="row-odd"><td><p>server-start</p></td>
-<td><p>Starts BAD server processes. By default reads configuration from conf/bad-defaults.conf and conf/workers</p></td>
+<td><p>Starts BAD server processes. By default reads configuration settings from .bad/bad.conf and .bad/workers.</p></td>
 </tr>
 <tr class="row-even"><td><p>server-stop</p></td>
-<td><p>Stops BAD server processes. By default reads configuration from conf/bad-defaults.conf and conf/workers</p></td>
+<td><p>Stops BAD server processes. By default reads configuration settings from .bad/bad.conf and .bad/workers.</p></td>
 </tr>
 </tbody>
 </table>
@@ -195,13 +195,11 @@
 <div class="section" id="execution">
 <h2>Execution<a class="headerlink" href="#execution" title="Permalink to this headline">¶</a></h2>
 <p>Once the server processes are running, experiments can be executed with the following command:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>bad -c my_candidate.py -o my_output_file.csv
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>bad run -c candidate_name -o my_output_file.csv -d dataset_name
 </pre></div>
 </div>
-<p>This runs experiments using the Candidate module my_candidate.py and stores the results in CSV format to my_output_file.csv. The output file is also called a dump file.</p>
-<p>The number of experiments is determined by the candidate parameters file (by default BAD_HOME/candidate_parameters.txt, overriden with the -p flag).</p>
+<p>The number of experiments is determined by the candidate parameters file (by default .bad/candidate_parameters.txt).</p>
 <p>A value parameter setting determines one experiment, while a range parameter settings determines an experiments for each value in the range.</p>
-<p>The total number of experiments is determined by multiplying the number of experiments for each parameter setting.</p>
 </div>
 </div>
 

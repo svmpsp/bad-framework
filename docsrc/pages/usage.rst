@@ -7,21 +7,21 @@ Usage
 
    usage: bad [-h] [-c BAD.CANDIDATE] [-d BAD.DATA] [-o BAD.DUMP.FILE]
               [-p BAD.CANDIDATE.PARAMETERS] [-q BAD.CANDIDATE.REQUIREMENTS] [-v]
-	      [{init,server-start,server-stop}]
+	      [{run,server-start,server-stop}]
 
 
 The BAD CLI is the main client provided with the BAD framework. It enables users to control BAD processes and run experiments on the framework.
 
 Basic commands
 --------------
-Commands are used to manage the BAD framework, all available commands are described in Table XXX.
+Commands are used to manage the BAD framework, all available commands are described in the following table.
 
 ================  ================================================================================================================================
  Command           Description
 ================  ================================================================================================================================
- init              Initializes BAD configuration files in current directory
- server-start      Starts BAD server processes. By default reads configuration from conf/bad-defaults.conf and conf/workers
- server-stop       Stops BAD server processes. By default reads configuration from conf/bad-defaults.conf and conf/workers
+ run               Runs a suite of anomaly detection experiments.
+ server-start      Starts BAD server processes. By default reads configuration settings from .bad/bad.conf and .bad/workers.
+ server-stop       Stops BAD server processes. By default reads configuration settings from .bad/bad.conf and .bad/workers.
 ================  ================================================================================================================================
 
 Execution
@@ -30,12 +30,8 @@ Once the server processes are running, experiments can be executed with the foll
 
 .. code-block:: bash
 
-   bad -c my_candidate.py -o my_output_file.csv
+   bad run -c candidate_name -o my_output_file.csv -d dataset_name
 
-This runs experiments using the Candidate module my_candidate.py and stores the results in CSV format to my_output_file.csv. The output file is also called a dump file.
+The number of experiments is determined by the candidate parameters file (by default .bad/candidate_parameters.txt).
 
-The number of experiments is determined by the candidate parameters file (by default BAD_HOME/candidate_parameters.txt, overriden with the -p flag). 
-
-A value parameter setting determines one experiment, while a range parameter settings determines an experiments for each value in the range. 
-
-The total number of experiments is determined by multiplying the number of experiments for each parameter setting.
+A value parameter setting determines one experiment, while a range parameter settings determines an experiments for each value in the range.

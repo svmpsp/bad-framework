@@ -10,13 +10,12 @@ Welcome to BAD: Benchmarking for Anomaly Detection!
    The **BAD framework** lets users execute **arbitrary code** on the server machine.
 
    **DO NOT** deploy on production critical systems or open networks.
-   Security features might be added in later releases.
+   Security features might be added in future releases.
 
-
-BAD is a benchmarking framework for unsupervised anomaly detection
+**BAD** is a benchmarking framework for unsupervised anomaly detection
 algorithms.
 
-BAD's features include:
+**BAD**'s features include:
 
 - a simple :ref:`command line interface <pages/usage>`.
 - a collection of benchmark :ref:`data sets <pages/datasets>` from the
@@ -28,7 +27,7 @@ BAD's features include:
 - extensibility via custom python modules implementing the
   :ref:`Candidate API <pages/candidate>`.
 
-BAD is built with lots of ❤ and Python.
+**BAD** is built with lots of ❤ and Python.
 
 .. toctree::
    :maxdepth: 2
