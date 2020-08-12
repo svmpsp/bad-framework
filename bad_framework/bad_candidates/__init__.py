@@ -15,9 +15,9 @@ CANDIDATE_REQUIREMENTS = {
     "fb": ["pyod"],
     "iforest": ["scikit-learn"],
     "knn": ["scikit-learn"],
-    "loci": ["numpy", "pyod"],
-    "lof": ["numpy", "scikit-learn"],
-    "ocsvm": ["numpy", "pyod"],
+    "loci": ["pyod"],
+    "lof": ["scikit-learn"],
+    "ocsvm": ["pyod"],
 }
 
 

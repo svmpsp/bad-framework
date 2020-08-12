@@ -1,14 +1,15 @@
+*~
 .coverage
 .idea
 .python-version
 .pytest_report
 .pypi_report
 __pycache__
+TODO.md
 bad_framework.egg-info
 build
 dist
 docs/.buildinfo
 docsrc/_build
+staging
 venv-bad-framework
-TODO.md
-*~

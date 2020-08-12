@@ -9,11 +9,6 @@ class FeatureBagging:
     Proceedings of the eleventh ACM SIGKDD international conference
     on Knowledge discovery in data mining. ACM, 2005.
 
-    The method works as an ensemble of weak detectors. This implementation uses the
-    Local Outlier Factor algorithm as base detector. FeatureBagging selects random
-    subspaces within the full feature set and applies the base detector on each subspace.
-    It then combines the resulting outlier scores using the combination function.
-
     This class wraps the implementation provided by the pyod library
     (see https://pyod.readthedocs.io/en/latest/pyod.models.html#module-pyod.models.feature_bagging)  # noqa 501
 

@@ -7,14 +7,6 @@ class IForest:
     Liu, Fei Tony, Kai Ming Ting, and Zhi-Hua Zhou. "Isolation forest."
     Eighth IEEE International Conference on Data Mining. IEEE, 2008.
 
-    The method identifies as outliers those elements that can be
-    easily isolated through random axis-parallel cuts in the data
-    space. Intuitively, points in dense regions of space require a
-    larger number of cuts to be isolated from the rest of the dataset.
-    The IForest outlier score is a function of the number of cuts required to isolate
-    a data element, i.e. the depth of the isolation tree. The algorithm generates several
-    trees and aggregates the scores obtained from each component.
-
     Parameters:
     - m: (int) number of trees (defaults to 10).
     - partition_size: (int) number of data elements to use for constructing

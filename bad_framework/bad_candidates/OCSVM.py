@@ -1,15 +1,12 @@
-import numpy as np
 from pyod.models.ocsvm import OCSVM as SVM
 
 
 class OCSVM:
-    """Implements the one-class Support Vector Machine method proposed in
+    """Implements the one-class Support Vector Machine method proposed in:
 
-    TODO: add documentation
-
-    ???
-
-    The method ...
+    Schölkopf, Bernhard, et al. "Estimating the support of a
+    high-dimensional distribution." Neural computation 13.7 (2001):
+    1443-1471.
 
     Parameters:
     - kernel: (string) kernel function to use (defaults to
@@ -30,21 +27,16 @@ class OCSVM:
         self.nu = float(kwargs.get("nu", 0.5))
         self.tolerance = float(kwargs.get("tolerance", 1e-3))
         self.seed = int(kwargs["seed"])
+        self._model = None
 
     def fit(self, train_data):
-        raise NotImplementedError()
+        self._model = SVM(
+            kernel=self.kernel, nu=self.nu, tol=self.tolerance, max_iter=1000,
+        ).fit(train_data)
+        return self
 
     def score(self, element):
-        print(np, SVM)
-        raise NotImplementedError()
-
-    # def score(self, data_matrix):
-    #
-    #     feature_bagging_model = SVM(
-    #         kernel=self.kernel, nu=self.nu, tol=self.tolerance, max_iter=1000,
-    #     ).fit(data_matrix)
-    #
-    #     scores = feature_bagging_model.decision_scores_.reshape(
-    #         (data_matrix.shape[0], 1)
-    #     )
-    #     return np.concatenate((data_matrix, scores), axis=1,)
+        if not self._model:
+            raise ValueError("invalid state. The model has not been trained.")
+        element = element.reshape(1, -1)
+        return self._model.decision_function(element)[0]
