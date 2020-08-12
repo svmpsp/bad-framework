@@ -10,7 +10,7 @@ INSTALL_DIR ?= install
 
 SOURCES ?= $(shell find $(PACKAGE_NAME))
 TEST_SOURCES ?= pytest.ini $(shell find tests)
-DOC_SOURCES ?= $(shell find docsrc)
+DOC_SOURCES ?= $(shell find docsrc | grep -v `_`)
 
 .PHONY: clean help
 
