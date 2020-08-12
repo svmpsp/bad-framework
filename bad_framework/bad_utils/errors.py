@@ -1,3 +1,9 @@
+"""Copyright (C) 2020 Sivam Pasupathipillai <s.pasupathipillai@unitn.it>.
+
+All rights reserved.
+"""
+
+
 class InvalidCandidateError(Exception):
     pass
 

@@ -1,4 +1,7 @@
-"""
+"""Copyright (C) 2020 Sivam Pasupathipillai <s.pasupathipillai@unitn.it>.
+
+All rights reserved.
+
 Command-line client for the Benchmarking Anomaly Detection (BAD) framework.
 """
 import argparse

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Copyright (C) 2020 Sivam Pasupathipillai <s.pasupathipillai@unitn.it>.
+# All rights reserved.
 
 if [ ! "$#" -eq 1 ]; then
   echo "Usage: start_master.sh BAD_MASTER_PORT";

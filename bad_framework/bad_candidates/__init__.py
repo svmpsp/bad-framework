@@ -1,3 +1,7 @@
+"""Copyright (C) 2020 Sivam Pasupathipillai <s.pasupathipillai@unitn.it>.
+
+All rights reserved.
+"""
 import os
 
 CANDIDATE_FILES = {

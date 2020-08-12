@@ -1,4 +1,9 @@
-"""Main module for the BAD master process implementation."""
+"""Copyright (C) 2020 Sivam Pasupathipillai <s.pasupathipillai@unitn.it>.
+
+All rights reserved.
+
+Main module for the BAD master process implementation.
+"""
 import json
 import logging
 import os

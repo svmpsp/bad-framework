@@ -1,64 +1,68 @@
-"""Package for useful abstract data types (ADTs) for the BAD framework.
+"""Copyright (C) 2020 Sivam Pasupathipillai <s.pasupathipillai@unitn.it>.
 
-    CandidateSpec: represents the specification for a Candidate.
-    CandidateSpec fields are:
-    - name, candidate name.
-    - candidate_path, path to Candidate module.
-    - requirements_path, path to Candidate requirements file.
-    - parameters_path, path to Candidate parameters file.
+All rights reserved.
 
-    >>> cs = CandidateSpec(
-    ...    "local",
-    ...    "DummyCandidate.py",
-    ... )
-    >>> cs.source
-    'local'
-    >>> cs.url
-    'DummyCandidate.py'
+Package for useful abstract data types (ADTs) for the BAD framework.
 
-    ExperimentSettings: represents the specification of an experiment.
-    ExperimentSettings fields are:
-    - data, data set identifier
-    - parameters, semicolon-separated hyperparameter string.
+CandidateSpec: represents the specification for a Candidate.
+CandidateSpec fields are:
+- name, candidate name.
+- candidate_path, path to Candidate module.
+- requirements_path, path to Candidate requirements file.
+- parameters_path, path to Candidate parameters file.
 
-    >>> es = ExperimentSettings("test_data", "a=1;b=2;c=3")
-    >>> es.dataset_name
-    'test_data'
-    >>> es.parameters
-    'a=1;b=2;c=3'
+>>> cs = CandidateSpec(
+...    "local",
+...    "DummyCandidate.py",
+... )
+>>> cs.source
+'local'
+>>> cs.url
+'DummyCandidate.py'
 
-    ValueParameter: represents a parameter specified as a single value.
-    ValueParameter fields are:
-    - value, the value for the parameter.
+ExperimentSettings: represents the specification of an experiment.
+ExperimentSettings fields are:
+- data, data set identifier
+- parameters, semicolon-separated hyperparameter string.
 
-    >>> vp = ValueParameter(100)
-    >>> vp.value
-    100
+>>> es = ExperimentSettings("test_data", "a=1;b=2;c=3")
+>>> es.dataset_name
+'test_data'
+>>> es.parameters
+'a=1;b=2;c=3'
 
-    RangeParameter: represents a parameter range of values.
-    RangeParamete fields are:
-    - start, the first value in the range.
-    - end, the last value in the range.
-    - step, the interval between elements in the range.
+ValueParameter: represents a parameter specified as a single value.
+ValueParameter fields are:
+- value, the value for the parameter.
 
-    >>> rp = RangeParameter(2, 10, 2)
-    >>> rp.start
-    2
-    >>> rp.end
-    10
-    >>> rp.step
-    2
+>>> vp = ValueParameter(100)
+>>> vp.value
+100
 
-    RunSpec: represents an assignment of an experiment to a worker.
-    RunSpec fields are:
-    - worker, the worker object.
-    - experiment, the experiment object.
+RangeParameter: represents a parameter range of values.
+RangeParamete fields are:
+- start, the first value in the range.
+- end, the last value in the range.
+- step, the interval between elements in the range.
 
-    >>> rs = RunSpec("test_worker", "test_experiment")
-    >>> rs.worker
-    'test_worker'
-    >>> rs.experiment
-    'test_experiment'
+>>> rp = RangeParameter(2, 10, 2)
+>>> rp.start
+2
+>>> rp.end
+10
+>>> rp.step
+2
+
+RunSpec: represents an assignment of an experiment to a worker.
+RunSpec fields are:
+- worker, the worker object.
+- experiment, the experiment object.
+
+>>> rs = RunSpec("test_worker", "test_experiment")
+>>> rs.worker
+'test_worker'
+>>> rs.experiment
+'test_experiment'
 """
 from collections import namedtuple
 

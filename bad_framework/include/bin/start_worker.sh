@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Copyright (C) 2020 Sivam Pasupathipillai <s.pasupathipillai@unitn.it>.
+# All rights reserved.
 
 if [ "$#" -ne 2 ]; then
   echo "Usage: start_worker.sh BAD_WORKER_HOST BAD_WORKER_PORT";
