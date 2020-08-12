@@ -5,7 +5,6 @@
 .pytest_report
 .pypi_report
 __pycache__
-TODO.md
 bad_framework.egg-info
 build
 dist

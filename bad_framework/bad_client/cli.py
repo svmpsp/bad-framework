@@ -2,13 +2,11 @@ import datetime
 import json
 import logging
 import os
-import subprocess
 
 from bad_framework.bad_master import start_bad_master, stop_bad_master
 from bad_framework.bad_worker import start_bad_worker, stop_bad_worker
 from bad_framework.bad_utils.adt import CandidateSpec
 from bad_framework.bad_utils.files import (
-    delete_bad_files,
     parse_parameters,
     parse_requirements,
 )
@@ -201,60 +199,36 @@ def _validate_config(command, config):
     """Validates the config settings for a given command. Returns True if the config
     is valid, raises an exception otherwise.
 
-    :param command:
-    :param config:
-    :return:
+    :param command: (string)
+    :param config: (dict)
     """
-    if command == "server-start":
-        required = [
+    required_keys = {
+        "run": [
+            "bad.candidate",
+            "bad.candidate.parameters",
+            "bad.data",
+            "bad.experiment.seed",
+            "bad.experiment.trainset_size",
             "bad.master",
             "bad.master.ip",
             "bad.master.port",
-        ]
-        for key in required:
-            if key not in config:
-                return False
-    return True
+            "bad.workers",
+        ],
+        "server-start": ["bad.debug", "bad.master.port", "bad.workers"],
+        "server-stop": ["bad.workers"],
+    }
+    for key in required_keys[command]:
+        if key not in config:
+            raise ValueError("parameter '{key}' is required.".format(key=key))
 
 
 def handle_command(command, config):
-    if command in bad_commands:
-        _validate_config(command, config)
-        bad_commands[command](config)
-    else:
-        raise ValueError("invalid command: {}".format(command))
-
-
-def _restart_server(config):
-    _stop_server(config)
-    _start_server(config)
-
-
-def _print_bad_processes(config):
-    """
-    TODO:
-     - do some regexp matching and pretty output.
-     - now shows ps process
-
-    :param config:
-    :return:
-    """
-    ps_proc = subprocess.Popen(["ps -au"], shell=True, stdout=subprocess.PIPE)
-    for line in ps_proc.stdout:
-        line = line.decode("utf-8").strip()
-        if "bad_framework" in line:
-            print(line)
-
-
-def _clean_bad_files(config):
-    delete_bad_files()
+    _validate_config(command, config)
+    bad_commands[command](config)
 
 
 bad_commands = {
-    "clean": _clean_bad_files,
-    "ps": _print_bad_processes,
     "run": _run_bad_suite,
-    "server-restart": _restart_server,
     "server-start": _start_server,
     "server-stop": _stop_server,
 }
@@ -267,6 +241,6 @@ def get_commands():
 
     Examples:
     >>> cmds = list(get_commands()); cmds.sort(); cmds
-    ['clean', 'ps', 'run', 'server-restart', 'server-start', 'server-stop']
+    ['run', 'server-start', 'server-stop']
     """
     return bad_commands.keys()

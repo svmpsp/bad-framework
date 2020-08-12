@@ -170,27 +170,6 @@ def get_init_paths():
     return [file for file in raw_files if file not in exclude_files]
 
 
-def delete_bad_files():
-    """Deletes BAD files inside of the current directory.
-
-    :return: None
-    """
-    cur_dir = os.getcwd()
-
-    if not cur_dir:
-        raise ValueError("invalid directory path {}".format(cur_dir))
-
-    for path in get_init_paths():
-        absolute_path = os.path.join(cur_dir, path)
-        try:
-            if os.path.isdir(absolute_path):
-                shutil.rmtree(absolute_path)
-            else:
-                os.remove(absolute_path)
-        except FileNotFoundError as fnfe:
-            log.debug("cannot remove file: %s", str(fnfe))
-
-
 def copy_files_to_bad_directory(dest_dir):
     """Initializes the directory with all required files to run the BAD framework.
     These include all files in the bad_framework/include/defaults directory.

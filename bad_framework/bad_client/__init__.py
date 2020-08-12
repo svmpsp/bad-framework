@@ -1,19 +1,5 @@
-# Copyright (c) 2020 Sivam Pasupathipillai <s.pasupathipillai@unitn.it>.
-# All rights reserved.
 """
 Command-line client for the Benchmarking Anomaly Detection (BAD) framework.
-
- TODO:
-  - suite monitor is blocking
-  - move candidate requirements and parameters parsing to client, no need to send files.
-  - implement rescheduling of failed experiments.
-  - fix spark candidate in master/index, it does not keep track of old candidates.
-  - preliminary repartion Spark candidates to reduce task size.
-  - write conf validator for required parameters.
-  - move all validation to master.
-  - master host is not consistent between bin/scripts.sh and bad-client.
-  - manage connection errors in client.
-  - set global config in server procs (master_url, runner_id, etc.).
 """
 import argparse
 import logging
@@ -24,7 +10,7 @@ import sys
 from bad_framework.bad_utils.files import copy_files_to_bad_directory
 from bad_framework.bad_utils.magic import BAD_CONF_DIR, LOG_FORMAT
 
-from .cli import get_commands, handle_command
+from bad_framework.bad_client.cli import get_commands, handle_command
 
 logging.basicConfig(
     level=logging.INFO, format=LOG_FORMAT, datefmt="%Y-%m-%d %H:%M:%S",
@@ -48,8 +34,8 @@ def parse_config_file(config_filepath):
 def add_settings(runtime_config, loaded_settings):
     """Appends the loaded settings to runtime config, unless they are already defined.
 
-    :param runtime_config (dict): current runtime config.
-    :param loaded_settings (dict): additional config settings.
+    :param runtime_config: (dict) current runtime config.
+    :param loaded_settings: (dict) additional config settings.
     :return: (dict) updated runtime config.
     """
     for key in loaded_settings.keys():
@@ -159,26 +145,17 @@ def initialize_bad_directory():
 
 def main():
     config = parse_arguments()
-
     if config["bad.log.verbose"]:
         log.setLevel("DEBUG")
 
     initialize_bad_directory()
 
     config = load_default_config(config)
-
     print_config(config)
 
     command = config["command"]
+    handle_command(command, config)
 
-    if command:
-        handle_command(command, config)
-    else:
-        log.error(
-            "You must specify a command. Available commands are: %s",
-            ", ".join(get_commands()),
-        )
-        sys.exit(1)
     sys.exit(0)
 
 
