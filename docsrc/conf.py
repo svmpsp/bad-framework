@@ -3,6 +3,9 @@
 # This file only contains a selection of the most common options. For a full
 # list see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
+import datetime
+
+import bad_framework
 
 # -- Path setup --------------------------------------------------------------
 
@@ -17,12 +20,12 @@
 
 # -- Project information -----------------------------------------------------
 
-project = "BAD"
-copyright = "2020, Sivam Pasupathipillai"
+project = "bad-framework"
+copyright = str(datetime.datetime.now().year) + ", Sivam Pasupathipillai"
 author = "Sivam Pasupathipillai"
 
 # The full version, including alpha/beta/rc tags
-release = "1.2.3"
+release = bad_framework.__version__
 
 
 # -- General configuration ---------------------------------------------------
