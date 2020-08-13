@@ -3,6 +3,6 @@ The **BAD** framework is a distributed framework for benchmarking unsupervised a
 
 Please refer to the **[official documentation](https://passiv-me.github.io/bad-framework/)** for details.
 
-Copyright (C) 2020 Sivam Pasupathipillai - <s.pasupathipillai@unitn.it>.
+Copyright © 2020 Sivam Pasupathipillai - <s.pasupathipillai@unitn.it>.
 
 All rights reserved.
