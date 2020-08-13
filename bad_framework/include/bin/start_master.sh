@@ -19,7 +19,7 @@ function check_bad_master {
 check_bad_master
 
 BAD_MASTER_PORT="$1"
-BAD_HOME=$(pwd)  # Working directory where to store logs and intermediate files.
+BAD_HOME="$(pwd)/.bad"  # Working directory where to store logs and intermediate files.
 BAD_MASTER_HOME='/tmp/bad-framework'  # Server working directory where to store server files.
 LOGS_DIR="$BAD_HOME/logs"
 BAD_MASTER_LOG="$LOGS_DIR/bad-master_$BAD_MASTER_PORT.log"
