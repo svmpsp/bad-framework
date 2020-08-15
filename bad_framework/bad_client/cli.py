@@ -9,7 +9,7 @@ import os
 
 from bad_framework.bad_master import start_bad_master, stop_bad_master
 from bad_framework.bad_worker import start_bad_worker, stop_bad_worker
-from bad_framework.bad_utils.adt import CandidateSpec
+from bad_framework.bad_utils.adt import CandidateSpec, DataSpec
 from bad_framework.bad_utils.files import (
     parse_parameters,
     parse_requirements,
@@ -21,81 +21,17 @@ from .monitor import monitor_suite
 log = logging.getLogger("bad.client")
 
 
-def _load_workers(workers_filepath):
-
-    with open(workers_filepath, "r") as workers_file:
-        workers = []
-        for line in workers_file:
-            if line.strip() and not line.startswith("#"):
-                worker_host, worker_port = line.strip().split(":")
-                workers.append((worker_host, worker_port))
-    return workers
-
-
 def _add_default_parameters(parameters_list, config):
     parameters_list.append(("seed", config["bad.experiment.seed"]))
     parameters_list.append(("trainset_size", config["bad.experiment.trainset_size"]))
     return parameters_list
 
 
-def _generate_suite_settings(config):
-    """Generates JSON-encoded suite settings to be sent to the master.
-
-    TODO:
-     - add support for local data files.
-     - add support for remote candidate files.
-
-    :param config:
-    :return:
-    """
-    workers = _load_workers(config["bad.workers"])
-    candidate_spec = _load_candidate_spec(config["bad.candidate"])
-    parameters_list = parse_parameters(config["bad.candidate.parameters"])
-    parameters_list = _add_default_parameters(parameters_list, config)
-
-    return {
-        "master_address": "{master_host}:{master_port}".format(
-            master_host=config["bad.master.ip"], master_port=config["bad.master.port"]
-        ),
-        "data": config["bad.data"],
-        "workers": workers,
-        "candidate": candidate_spec,
-        "candidate_parameters": parameters_list,
-    }
-
-
-def _download_dump_file(config, suite_id):
-    dump_file_path = config["bad.dump.file"]
-    log.info(">>> Saving suite dump to %s", dump_file_path)
-    session_manager = HTTPSessionManager(
-        domain="{master_hostname}:{master_port}".format(
-            master_hostname=config["bad.master"], master_port=config["bad.master.port"],
-        )
-    )
-    suite_dump_url = "suite/{sid}/dump/".format(sid=suite_id)
-    response = session_manager.get(suite_dump_url)
-
-    with open(dump_file_path, "wb+") as dump_file:
-        if response.status_code == 200:
-            dump_file.write(response.content)
-            log.info("<<< Dump file saved.")
-        else:
-            log.error("%s - %s", response.reason, suite_dump_url)
-
-
-def _load_candidate_spec(candidate_url):
-    if os.path.pathsep in candidate_url:
-        return CandidateSpec("local", candidate_url)
-    else:
-        return CandidateSpec("remote", candidate_url)
-
-
 def _create_suite(config):
     """
     TODO:
-     - add support for uploading local .arff files
-     - move candidates on the server, add possibility to load local candidates
-
+     - documentation
+     
     :param config:
     :return:
     """
@@ -104,20 +40,24 @@ def _create_suite(config):
     suite_settings = _generate_suite_settings(config)
 
     candidate_spec = suite_settings["candidate"]
+    data_spec = suite_settings["data"]
+
+    files = {}
 
     if candidate_spec.source == "local":
-        log.info(">>> Submitting local candidate %s", candidate_spec)
+        log.info(">>> Submitting local candidate %s", candidate_spec.url)
         with open(candidate_spec.url, "rb") as local_candidate_file:
             candidate_content = local_candidate_file.read()
-        suite_settings["candidate_requirements"] = (
-            parse_requirements(config["bad.candidate.requirements"]),
+        suite_settings["candidate_requirements"] = parse_requirements(
+            config["bad.candidate.requirements"]
         )
-        files = {
-            "candidate_source": candidate_content,
-        }
-    else:
-        # If we use a default candidate, no additional files need to be uploaded.
-        files = {}
+        files["candidate_source"] = candidate_content
+
+    if data_spec.source == "local":
+        log.info(">>> Submitting local dataset %s", data_spec.url)
+        with open(data_spec.url, "rb") as local_dataset_file:
+            dataset_content = local_dataset_file.read()
+        files["data_source"] = dataset_content
 
     encoded_settings = bytes(json.dumps(suite_settings), encoding="utf-8")
     files["suite_settings"] = encoded_settings
@@ -141,6 +81,79 @@ def _create_suite(config):
             )
     else:
         raise ValueError("internal server error {}".format(suite_response.status_code))
+
+
+def _generate_suite_settings(config):
+    """Generates JSON-encoded suite settings to be sent to the master.
+
+    TODO:
+     - add support for local data files.
+     - add support for remote candidate files.
+
+    :param config:
+    :return:
+    """
+    workers = _load_workers(config["bad.workers"])
+    candidate_spec = _load_candidate_spec(config["bad.candidate"])
+    data_spec = _load_data_spec(config["bad.data"])
+    parameters_list = parse_parameters(config["bad.candidate.parameters"])
+    parameters_list = _add_default_parameters(parameters_list, config)
+
+    return {
+        "candidate": candidate_spec,
+        "candidate_parameters": parameters_list,
+        "data": data_spec,
+        "master_address": "{master_host}:{master_port}".format(
+            master_host=config["bad.master.ip"], master_port=config["bad.master.port"]
+        ),
+        "workers": workers,
+    }
+
+
+def _download_dump_file(config, suite_id):
+    dump_file_path = config["bad.dump.file"]
+    log.info(">>> Saving suite dump to %s", dump_file_path)
+    session_manager = HTTPSessionManager(
+        domain="{master_hostname}:{master_port}".format(
+            master_hostname=config["bad.master"], master_port=config["bad.master.port"],
+        )
+    )
+    suite_dump_url = "suite/{sid}/dump/".format(sid=suite_id)
+    response = session_manager.get(suite_dump_url)
+
+    with open(dump_file_path, "wb+") as dump_file:
+        if response.status_code == 200:
+            dump_file.write(response.content)
+            log.info("<<< Dump file saved.")
+        else:
+            log.error("%s - %s", response.reason, suite_dump_url)
+
+
+def _load_candidate_spec(candidate_url):
+    if os.path.isfile(candidate_url):
+        return CandidateSpec("local", candidate_url)
+    else:
+        return CandidateSpec("remote", candidate_url)
+
+
+def _load_data_spec(data_url):
+    if os.path.isfile(data_url):
+        # Dataset names cannot contain underscores
+        basename = os.path.basename(data_url)
+        return DataSpec("local", basename)
+    else:
+        return DataSpec("remote", data_url)
+
+
+def _load_workers(workers_filepath):
+
+    with open(workers_filepath, "r") as workers_file:
+        workers = []
+        for line in workers_file:
+            if line.strip() and not line.startswith("#"):
+                worker_host, worker_port = line.strip().split(":")
+                workers.append((worker_host, worker_port))
+    return workers
 
 
 def _run_bad_suite(config):
@@ -226,11 +239,6 @@ def _validate_config(command, config):
             raise ValueError("parameter '{key}' is required.".format(key=key))
 
 
-def handle_command(command, config):
-    _validate_config(command, config)
-    bad_commands[command](config)
-
-
 bad_commands = {
     "run": _run_bad_suite,
     "server-start": _start_server,
@@ -248,3 +256,8 @@ def get_commands():
     ['run', 'server-start', 'server-stop']
     """
     return bad_commands.keys()
+
+
+def handle_command(command, config):
+    _validate_config(command, config)
+    bad_commands[command](config)

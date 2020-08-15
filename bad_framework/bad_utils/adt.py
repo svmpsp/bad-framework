@@ -67,10 +67,11 @@ RunSpec fields are:
 from collections import namedtuple
 
 CandidateSpec = namedtuple("CandidateSpec", "source url")
+DataSpec = namedtuple("DataSpec", "source url")
 ExperimentSettings = namedtuple("ExperimentSettings", "dataset_name parameters")
-ValueParameter = namedtuple("ValueParameter", "value")
 RangeParameter = namedtuple("RangeParameter", "start end step")
 RunSpec = namedtuple("RunSpec", "worker experiment")
+ValueParameter = namedtuple("ValueParameter", "value")
 
 
 class ExperimentStatus:
