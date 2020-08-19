@@ -78,6 +78,7 @@ def monitor_suite(master_session, suite_id, heartbeat_interval=1):
             status == "completed" or status == "failed"
             for status in status_cache.values()
         ):
+            print()  # Print a newline to skip over the status bar
             break
         # Otherwise, wait and retry
         time.sleep(heartbeat_interval)

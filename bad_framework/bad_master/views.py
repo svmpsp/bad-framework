@@ -4,6 +4,7 @@ All rights reserved.
 
 Main module for the BAD master process implementation.
 """
+from time import sleep
 import json
 import logging
 import os
@@ -20,6 +21,7 @@ from bad_framework.bad_candidates import (
 from bad_framework.bad_utils import generate_experiments_settings, load_parameter_string
 from bad_framework.bad_utils.adt import (
     CandidateSpec,
+    DataSpec,
     ExperimentStatus,
     RangeParameter,
     ValueParameter,
@@ -394,7 +396,6 @@ class SuiteHandler(BaseMasterHandler):
 
         TODO:
          - make more clear/elegant/split
-         - parameterize sleep interval
 
         :param experiments: (list[models.Experiment]) list of experiments to schedule.
         :param workers: (list[models.Worker]) list of workers to
@@ -423,6 +424,7 @@ class SuiteHandler(BaseMasterHandler):
                 )
                 scheduled_experiments.append(next_experiment)
                 worker_index = (worker_index + 1) % workers_num
+            sleep(.1)
             scheduled_experiments_num = len(scheduled_experiments)
         log.info(
             "<<< Scheduling loop completed (%d/%d).",
@@ -486,7 +488,19 @@ class SuiteHandler(BaseMasterHandler):
             requirements=requirements,
         )
 
-    def _load_parameters_list(self, parameters_list):
+    def _add_local_dataset(self, message):
+        dataset_spec = DataSpec(*message["data"])
+
+        if dataset_spec.source == "local":
+            dataset_src = self.get_file_contents("data_source")
+            dataset_basename = os.path.basename(dataset_spec.url).replace("_", "-")
+            dataset_filename = os.path.join(get_include_dir(), "data", dataset_basename)
+            save_file(dataset_src, dataset_filename)
+            return dataset_basename.replace(".arff", "")
+        return dataset_spec.url
+
+    @classmethod
+    def _load_parameters_list(cls, parameters_list):
         parameters = {}
         for param_tuple in parameters_list:
             if len(param_tuple) == 2:
@@ -508,23 +522,32 @@ class SuiteHandler(BaseMasterHandler):
         """
         try:
             message = json.loads(self.get_file_contents("suite_settings"))
-            data_name = message["data"]
-            master_address = message["master_address"]
-            workers_list = message["workers"]
+
             suite = Suite.create()
-            candidate = self._get_candidate(suite.id, message)
+
+            data_name = self._add_local_dataset(message)
             if not Dataset.get_all():
                 Dataset.setup()
+
+            defined_datasets = [dataset.name for dataset in Dataset.get_all()]
+            log.info("Defined datasets: %r", defined_datasets)
+
             if data_name:
                 datasets = [Dataset.get_by_name(data_name)]
             else:
                 datasets = Dataset.get_all()
             dataset_names = [dataset.name for dataset in datasets]
+
+            master_address = message["master_address"]
+            workers_list = message["workers"]
             if not Worker.get_all():
                 Worker.setup(workers_list, master_address)
             workers = list(
                 Worker.get_all()  # this returns a non-subscriptable set-like
             )
+
+            candidate = self._get_candidate(suite.id, message)
+
             experiments = self._generate_suite_experiments(
                 suite=suite,
                 candidate=candidate,

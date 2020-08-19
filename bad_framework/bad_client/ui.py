@@ -64,4 +64,4 @@ def print_status_bar(start_ts, experiments_num, completed_num, failed_num):
     else:
         padded_message = "[ {} ".format(status_message)
         status_bar = padded_message + bar[len(padded_message) :]
-    print(status_bar)
+    print(status_bar, end="\r", flush=True)
