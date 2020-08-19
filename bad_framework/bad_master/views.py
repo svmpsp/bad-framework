@@ -4,6 +4,7 @@ All rights reserved.
 
 Main module for the BAD master process implementation.
 """
+from time import sleep
 import json
 import logging
 import os
@@ -423,6 +424,7 @@ class SuiteHandler(BaseMasterHandler):
                 )
                 scheduled_experiments.append(next_experiment)
                 worker_index = (worker_index + 1) % workers_num
+            sleep(.1)
             scheduled_experiments_num = len(scheduled_experiments)
         log.info(
             "<<< Scheduling loop completed (%d/%d).",
@@ -521,12 +523,9 @@ class SuiteHandler(BaseMasterHandler):
         try:
             message = json.loads(self.get_file_contents("suite_settings"))
 
-            log.info("Message is: %r", message)
-
             suite = Suite.create()
 
             data_name = self._add_local_dataset(message)
-            log.info("DATA_ is %s", data_name)
             if not Dataset.get_all():
                 Dataset.setup()
 

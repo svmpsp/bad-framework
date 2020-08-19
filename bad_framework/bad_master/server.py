@@ -70,7 +70,9 @@ class BADMasterServer:
             master_home=home_dir,
             master_port=self._port,
         )
-        self._server = tornado.httpserver.HTTPServer(self._app)
+        self._server = tornado.httpserver.HTTPServer(
+            self._app, max_buffer_size=524288000
+        )
 
     def start(self):
         log.info(">>> Starting BAD master on port %d", self._port)

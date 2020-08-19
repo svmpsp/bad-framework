@@ -28,10 +28,10 @@ def _add_default_parameters(parameters_list, config):
 
 
 def _create_suite(config):
-    """
+    """Hello world!
+
     TODO:
      - documentation
-     
     :param config:
     :return:
     """
@@ -138,9 +138,7 @@ def _load_candidate_spec(candidate_url):
 
 def _load_data_spec(data_url):
     if os.path.isfile(data_url):
-        # Dataset names cannot contain underscores
-        basename = os.path.basename(data_url)
-        return DataSpec("local", basename)
+        return DataSpec("local", data_url)
     else:
         return DataSpec("remote", data_url)
 
