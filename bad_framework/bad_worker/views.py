@@ -190,7 +190,9 @@ class RunHandler(BaseWorkerHandler):
         return metrics_path
 
     def _generate_scores(
-        self, candidate, data_matrix,
+        self,
+        candidate,
+        data_matrix,
     ):
         feature_matrix = data_matrix[:, 2:]
 
@@ -260,7 +262,8 @@ class RunHandler(BaseWorkerHandler):
             home_dir=home_dir, suite_id=self._suite_id
         )
         data_path = "{home_dir}/dataset/{data_name}.arff".format(
-            home_dir=home_dir, data_name=self._data_name,
+            home_dir=home_dir,
+            data_name=self._data_name,
         )
         candidate_name = get_candidate_name(candidate_path)
 
@@ -284,9 +287,15 @@ class RunHandler(BaseWorkerHandler):
             #     result_matrix=result_matrix,
             # )
             log.info("Generating metrics file...")
-            metrics_path = self._generate_metrics_file(labels=labels, scores=scores,)
+            metrics_path = self._generate_metrics_file(
+                labels=labels,
+                scores=scores,
+            )
             log.info("Generating ROC plot...")
-            roc_path = self._generate_roc_file(labels=labels, scores=scores,)
+            roc_path = self._generate_roc_file(
+                labels=labels,
+                scores=scores,
+            )
             log.info("Sending results to master...")
             await self._send_results(
                 # scores_path=scores_path,

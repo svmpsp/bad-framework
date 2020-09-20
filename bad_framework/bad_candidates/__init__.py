@@ -12,6 +12,7 @@ CANDIDATE_FILES = {
     "loci": "LOCI.py",
     "lof": "LOF.py",
     "ocsvm": "OCSVM.py",
+    "partknn": "PartKNN.py",
 }
 
 CANDIDATE_REQUIREMENTS = {
@@ -22,6 +23,7 @@ CANDIDATE_REQUIREMENTS = {
     "loci": ["pyod"],
     "lof": ["scikit-learn"],
     "ocsvm": ["pyod"],
+    "partknn": ["numpy", "pandas", "scikit-learn"],
 }
 
 

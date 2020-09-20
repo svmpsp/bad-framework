@@ -47,5 +47,6 @@ def stop_bad_worker(hostname):
         "hostname": hostname,
     }
     subprocess.call(
-        ["source {script} {hostname} > /dev/null".format(**params)], shell=True,
+        ["source {script} {hostname} > /dev/null".format(**params)],
+        shell=True,
     )

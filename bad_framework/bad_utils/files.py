@@ -81,7 +81,10 @@ def parse_range_parameter(fields):
     else:
         raise ValueError(
             "invalid parameter range for {name}: <{start}, {end}, {step}> ".format(
-                name=param_name, start=start, end=end, step=step,
+                name=param_name,
+                start=start,
+                end=end,
+                step=step,
             )
         )
 

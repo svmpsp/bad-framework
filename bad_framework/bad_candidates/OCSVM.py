@@ -35,7 +35,10 @@ class OCSVM:
 
     def fit(self, train_data):
         self._model = SVM(
-            kernel=self.kernel, nu=self.nu, tol=self.tolerance, max_iter=1000,
+            kernel=self.kernel,
+            nu=self.nu,
+            tol=self.tolerance,
+            max_iter=1000,
         ).fit(train_data)
         return self
 

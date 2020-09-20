@@ -25,7 +25,8 @@ def start_bad_master(port, debug=False):
         "port": port,
     }
     subprocess.call(
-        ["{flag} source {script} {port} > /dev/null".format(**params)], shell=True,
+        ["{flag} source {script} {port} > /dev/null".format(**params)],
+        shell=True,
     )
 
 

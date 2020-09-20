@@ -56,7 +56,11 @@ def print_status_bar(start_ts, experiments_num, completed_num, failed_num):
     bar = get_progress_bar(int(terminal_width), percentage)
     elapsed_seconds = int((datetime.datetime.now() - start_ts).total_seconds())
     status_message = format_status_message(
-        elapsed_seconds, experiments_num, completed_num, failed_num, percentage,
+        elapsed_seconds,
+        experiments_num,
+        completed_num,
+        failed_num,
+        percentage,
     )
     overhead = 4
     if len(status_message) + overhead >= len(bar):

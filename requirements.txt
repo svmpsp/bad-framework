@@ -1,9 +1,13 @@
 black
+numpy
 pyod
+pyspark
+pyspark-stubs
 pytest
 pytest-black
 pytest-cov
 pytest-flake8
+scikit-learn
 sphinx
 sphinx-rtd-theme
 twine

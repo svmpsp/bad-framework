@@ -26,7 +26,10 @@ class LOF:
 
     def fit(self, train_data):
         self._model = LocalOutlierFactor(
-            n_neighbors=self.k, algorithm="kd_tree", contamination="auto", novelty=True,
+            n_neighbors=self.k,
+            algorithm="kd_tree",
+            contamination="auto",
+            novelty=True,
         ).fit(train_data)
         return self
 

@@ -63,7 +63,8 @@ def _create_suite(config):
     files["suite_settings"] = encoded_settings
 
     master_hostname = "{hostname}:{port}".format(
-        hostname=config["bad.master"], port=config["bad.master.port"],
+        hostname=config["bad.master"],
+        port=config["bad.master.port"],
     )
     master_session = HTTPSessionManager(domain=master_hostname)
 
@@ -115,7 +116,8 @@ def _download_dump_file(config, suite_id):
     log.info(">>> Saving suite dump to %s", dump_file_path)
     session_manager = HTTPSessionManager(
         domain="{master_hostname}:{master_port}".format(
-            master_hostname=config["bad.master"], master_port=config["bad.master.port"],
+            master_hostname=config["bad.master"],
+            master_port=config["bad.master.port"],
         )
     )
     suite_dump_url = "suite/{sid}/dump/".format(sid=suite_id)

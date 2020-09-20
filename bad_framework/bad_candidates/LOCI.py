@@ -28,7 +28,10 @@ class LOCI:
         self._model = None
 
     def fit(self, train_data):
-        self._model = Loci(alpha=self.alpha, k=self.k,).fit(train_data)
+        self._model = Loci(
+            alpha=self.alpha,
+            k=self.k,
+        ).fit(train_data)
         return self
 
     def score(self, element):

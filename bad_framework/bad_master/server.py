@@ -64,7 +64,10 @@ class BADMasterServer:
                 (r"^/suite/$", SuiteHandler),
                 (r"^/suite/(?P<suite_id>[a-z0-9-]+)/$", SuiteHandler),
                 (r"^/suite/(?P<suite_id>[a-z0-9-]+)/dump/$", SuiteDumpHandler),
-                (r"^/suite/(?P<suite_id>[a-z0-9-]+)/status/$", SuiteStatusHandler,),
+                (
+                    r"^/suite/(?P<suite_id>[a-z0-9-]+)/status/$",
+                    SuiteStatusHandler,
+                ),
             ],
             debug=options.master_debug,
             master_home=home_dir,

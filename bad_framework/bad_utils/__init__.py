@@ -29,7 +29,8 @@ def generate_experiments_settings(datasets, parameter_settings):
         parameter_strings.append(get_parameter_string(parameter_dict))
     for combination in itertools.product(datasets, parameter_strings):
         yield adt.ExperimentSettings(
-            dataset_name=combination[0], parameters=combination[1],
+            dataset_name=combination[0],
+            parameters=combination[1],
         )
 
 

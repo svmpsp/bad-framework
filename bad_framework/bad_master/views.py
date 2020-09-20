@@ -146,7 +146,15 @@ class DatasetHandler(BaseMasterHandler):
         """
         try:
             dataset = Dataset.get_by_name(dataset_name)
-            with open(dataset.path, "rb") as data_file:
+            if dataset:
+                # Default dataset
+                dataset_path = dataset.path
+            else:
+                # Locally uploaded dataset
+                dataset_path = os.path.join(
+                    self.get_wd(), "dataset", dataset_name + ".arff"
+                )
+            with open(dataset_path, "rb") as data_file:
                 content = data_file.read()
                 self.write(content)
             self.set_status(200)
@@ -385,7 +393,9 @@ class SuiteHandler(BaseMasterHandler):
     @classmethod
     def _get_update_message(cls, running, scheduled, total):
         return "...{r} ({s}/{t}) running (scheduled/total) experiments.".format(
-            r=running, s=scheduled, t=total,
+            r=running,
+            s=scheduled,
+            t=total,
         )
 
     async def _start_scheduling_loop(self, experiments, workers):
@@ -420,11 +430,12 @@ class SuiteHandler(BaseMasterHandler):
             if running_experiments_num < workers_num:
                 next_experiment, *todo_experiments = todo_experiments
                 await self._schedule_experiment(
-                    experiment=next_experiment, worker=workers[worker_index],
+                    experiment=next_experiment,
+                    worker=workers[worker_index],
                 )
                 scheduled_experiments.append(next_experiment)
                 worker_index = (worker_index + 1) % workers_num
-            sleep(.1)
+            sleep(0.1)
             scheduled_experiments_num = len(scheduled_experiments)
         log.info(
             "<<< Scheduling loop completed (%d/%d).",
@@ -494,7 +505,7 @@ class SuiteHandler(BaseMasterHandler):
         if dataset_spec.source == "local":
             dataset_src = self.get_file_contents("data_source")
             dataset_basename = os.path.basename(dataset_spec.url).replace("_", "-")
-            dataset_filename = os.path.join(get_include_dir(), "data", dataset_basename)
+            dataset_filename = os.path.join(self.get_wd(), "dataset", dataset_basename)
             save_file(dataset_src, dataset_filename)
             return dataset_basename.replace(".arff", "")
         return dataset_spec.url
@@ -529,14 +540,10 @@ class SuiteHandler(BaseMasterHandler):
             if not Dataset.get_all():
                 Dataset.setup()
 
-            defined_datasets = [dataset.name for dataset in Dataset.get_all()]
-            log.info("Defined datasets: %r", defined_datasets)
-
             if data_name:
-                datasets = [Dataset.get_by_name(data_name)]
+                dataset_names = [data_name]
             else:
-                datasets = Dataset.get_all()
-            dataset_names = [dataset.name for dataset in datasets]
+                dataset_names = [dataset.name for dataset in Dataset.get_all()]
 
             master_address = message["master_address"]
             workers_list = message["workers"]

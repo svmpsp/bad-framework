@@ -151,6 +151,7 @@ class Suite(Model):
 
     def __init__(self):
         self.id = self._get_id("suite")
+        self.created_ts = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     @classmethod
     def create(cls):

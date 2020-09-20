@@ -16,7 +16,9 @@ from bad_framework.bad_utils.magic import BAD_CONF_DIR, LOG_FORMAT
 from bad_framework.bad_client.cli import get_commands, handle_command
 
 logging.basicConfig(
-    level=logging.INFO, format=LOG_FORMAT, datefmt="%Y-%m-%d %H:%M:%S",
+    level=logging.INFO,
+    format=LOG_FORMAT,
+    datefmt="%Y-%m-%d %H:%M:%S",
 )
 log = logging.getLogger("bad.client")
 
@@ -81,7 +83,10 @@ def parse_arguments():
     """
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "command", type=str, choices=get_commands(), help="BAD framework command",
+        "command",
+        type=str,
+        choices=get_commands(),
+        help="BAD framework command",
     )
     parser.add_argument(
         "-c",
@@ -91,10 +96,18 @@ def parse_arguments():
         help="path to Candidate implementation",
     )
     parser.add_argument(
-        "-d", "--data", dest="bad.data", type=str, help="data set identifier",
+        "-d",
+        "--data",
+        dest="bad.data",
+        type=str,
+        help="data set identifier",
     )
     parser.add_argument(
-        "-o", "--dump-file", dest="bad.dump.file", type=str, help="path to output file",
+        "-o",
+        "--dump-file",
+        dest="bad.dump.file",
+        type=str,
+        help="path to output file",
     )
     parser.add_argument(
         "-p",

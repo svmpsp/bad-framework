@@ -84,17 +84,14 @@ class HTTPSessionManager:
 class AsyncHTTPSessionManager:
     """Utility class for managing a persistent HTTP session."""
 
-    def __init__(self, domain, timeout=300):
+    def __init__(self, domain, timeout=None):
         """Initializes the SessionManager to connect to a given hostname.
         A connection timeout can be optionally specified.
 
         :param domain: (string) destination hostname.
         :param timeout: (int) connection timeout in seconds (defaults=300, or 5 minutes).
         """
-        try:
-            self._timeout = int(timeout)
-        except ValueError:
-            raise ValueError("Invalid connection timeout value: {}".format(timeout))
+        self._timeout = timeout
 
         if domain.startswith("http://"):
             self._fq_domain = domain

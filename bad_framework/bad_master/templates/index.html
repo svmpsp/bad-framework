@@ -10,7 +10,7 @@
         <ul>
             {% for suite in suites %}
                 <li>
-                    <a href="/suite/{{ suite.id }}/">Suite {{ suite.id }}</a>
+                    <a href="/suite/{{ suite.id }}/">{{ suite.created_ts }} - Suite {{ suite.id }}</a>
                 </li>
             {% endfor %}
         </ul>
