@@ -117,7 +117,7 @@ class SetupHandler(BaseWorkerHandler):
             for dataset in datasets
         ]
         data_paths = [
-            "{base_path}/dataset/{dataset_name}.arff".format(
+            "{base_path}/datasets/{dataset_name}.arff".format(
                 base_path=base_path, dataset_name=dataset
             )
             for dataset in datasets
@@ -261,7 +261,7 @@ class RunHandler(BaseWorkerHandler):
         candidate_path = "{home_dir}/{suite_id}/candidate.py".format(
             home_dir=home_dir, suite_id=self._suite_id
         )
-        data_path = "{home_dir}/dataset/{data_name}.arff".format(
+        data_path = "{home_dir}/datasets/{data_name}.arff".format(
             home_dir=home_dir,
             data_name=self._data_name,
         )
