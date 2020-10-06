@@ -36,6 +36,7 @@ def get_candidate_name(candidate_path):
             if match:
                 # The first capture group is the class name
                 candidate_name = str(match[1])
+                break
     return candidate_name
 
 

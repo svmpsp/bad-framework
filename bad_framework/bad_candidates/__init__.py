@@ -7,6 +7,7 @@ import os
 CANDIDATE_FILES = {
     "dummy": "Dummy.py",
     "fb": "FeatureBagging.py",
+    "gravity": "Gravity.py",
     "iforest": "IForest.py",
     "knn": "KNN.py",
     "loci": "LOCI.py",
@@ -18,6 +19,7 @@ CANDIDATE_FILES = {
 CANDIDATE_REQUIREMENTS = {
     "dummy": ["numpy"],
     "fb": ["pyod"],
+    "gravity": ["scikit-learn", "scipy"],
     "iforest": ["scikit-learn"],
     "knn": ["scikit-learn"],
     "loci": ["pyod"],

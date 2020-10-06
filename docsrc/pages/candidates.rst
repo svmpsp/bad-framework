@@ -1,4 +1,4 @@
-.. _pages/candidate:
+.. _pages/candidates:
    
 Algorithms
 ==========

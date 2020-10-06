@@ -1,18 +1,18 @@
 .. _pages/parameters:
    
-Hyper-parameter tuning
+Hyperparameter tuning
 ======================
 BAD is designed to run a large number of experiments in parallel. This enables effective parameter searches.
 
 The BAD parameter API was developed to be both intuitive and powerful.
 
-Parameters should be specific for each :ref:`Candidate <pages/candidate>`.
+Parameters should be specific for each :ref:`Candidate <pages/candidates>`.
 
 The parameters API is used to define the experiments to be run by the BAD framework. Each parameter combination defines an experiment.
 
 The Candidate parameters file
 -----------------------------
-All Candidate parameters are defined in the **candidate_parameters.txt** file.
+All Candidate parameters are defined in the **.bad/candidate_parameters.txt** file.
 
 This file contains a parameter setting for each line. The Candidate parameters file also supports line comments.
 

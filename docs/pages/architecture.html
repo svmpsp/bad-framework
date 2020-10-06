@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Installation &mdash; bad-framework 0.1.0 0.1.0 documentation</title>
+  <title>BAD architecture &mdash; bad-framework 0.1.0 0.1.0 documentation</title>
   
 
   
@@ -36,8 +36,8 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Usage" href="usage.html" />
-    <link rel="prev" title="BAD: Benchmarking for Anomaly Detection" href="../index.html" /> 
+    <link rel="next" title="Contributing to BAD" href="contributions.html" />
+    <link rel="prev" title="Hyperparameter tuning" href="parameters.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -84,12 +84,12 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="datasets.html">Datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="candidates.html">Algorithms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="parameters.html">Hyperparameter tuning</a></li>
-<li class="toctree-l1"><a class="reference internal" href="architecture.html">BAD architecture</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">BAD architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributions.html">Contributing to BAD</a></li>
 </ul>
 
@@ -137,7 +137,7 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>Installation</li>
+      <li>BAD architecture</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -154,21 +154,17 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="installation">
-<span id="pages-installation"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>We recommend installing BAD inside a <a class="reference external" href="https://virtualenv.pypa.io/en/latest/">virtualenv</a>.</p>
-</div>
-<p>BAD can be installed via <strong>pip</strong> using:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install --upgrade --user bad-framework
-</pre></div>
-</div>
-<p>The above command should install the BAD client (<strong>bad</strong>) into the current environment.</p>
-<p>To verify the installation run:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>bad -h
-</pre></div>
-</div>
+  <div class="section" id="bad-architecture">
+<span id="pages-architecture"></span><h1>BAD architecture<a class="headerlink" href="#bad-architecture" title="Permalink to this headline">¶</a></h1>
+<p>The BAD framework relies on a collection of independent processes organized as a master-worker architecture.</p>
+<p>The main components of the framework are:</p>
+<ul class="simple">
+<li><p><strong>BAD client -</strong> user facing application that is responsible for initialization, parameter settings and candidate files.</p></li>
+<li><p><strong>BAD master -</strong> master server process. Responsible for communicating with the client, storing experiment results and initializing and orchestrating workers.</p></li>
+<li><p><strong>BAD worker(s) -</strong> worker server process (one or several). Responsible for running the experiments and computing the anomaly detection results.</p></li>
+</ul>
+<p>In order to use BAD, the user interacts with a BAD client (for example the <a class="reference internal" href="usage.html#pages-usage"><span class="std std-ref">BAD CLI</span></a>) in order to configure, initialize and communicate with the BAD server processes.</p>
+<p>After initialization, the user can also communicate with the <strong>BAD master</strong> directly via a web browser, in order to inspect experiment results and monitor execution.</p>
 </div>
 
 
@@ -179,10 +175,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="usage.html" class="btn btn-neutral float-right" title="Usage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="contributions.html" class="btn btn-neutral float-right" title="Contributing to BAD" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="../index.html" class="btn btn-neutral float-left" title="BAD: Benchmarking for Anomaly Detection" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="parameters.html" class="btn btn-neutral float-left" title="Hyperparameter tuning" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

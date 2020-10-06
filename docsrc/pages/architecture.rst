@@ -1,7 +1,7 @@
-.. _pages/execution:
+.. _pages/architecture:
    
-BAD execution model
-===================
+BAD architecture
+================
 
 The BAD framework relies on a collection of independent processes organized as a master-worker architecture.
 
