@@ -19,8 +19,8 @@ Commands are used to manage the BAD framework, all available commands are descri
 ================  ================================================================================================================================
  Command           Description
 ================  ================================================================================================================================
- run               Runs a suite of anomaly detection experiments.
  server-start      Starts BAD server processes. By default reads configuration settings from .bad/bad.conf and .bad/workers.
+ run               Runs a suite of anomaly detection experiments.
  server-stop       Stops BAD server processes. By default reads configuration settings from .bad/bad.conf and .bad/workers.
 ================  ================================================================================================================================
 

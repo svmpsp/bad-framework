@@ -6,12 +6,6 @@
 BAD: Benchmarking for Anomaly Detection
 =======================================
 
-.. warning::
-   The **BAD framework** lets users execute **arbitrary code** on the server machine.
-
-   **DO NOT** deploy on production critical systems or open networks.
-   Security features might be added in future releases.
-
 **BAD** is a benchmarking framework for unsupervised anomaly detection.
 
 With **BAD** you can:
@@ -30,6 +24,12 @@ With **BAD** you can:
 - extensibility via custom python modules implementing the
   :ref:`Candidate API <pages/candidates>`.
 
+.. warning::
+   The **BAD framework** lets users execute **arbitrary code** on the server machine.
+
+   **DO NOT** deploy on production critical systems or open networks.
+   Security features might be added in future releases.
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
@@ -40,7 +40,8 @@ With **BAD** you can:
    pages/candidates
    pages/parameters
    pages/architecture
-   pages/contributions
+   pages/citing
+   pages/contributing
 
 Indices and tables
 ==================

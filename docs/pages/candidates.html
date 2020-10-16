@@ -88,14 +88,19 @@
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="datasets.html">Datasets</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Algorithms</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#the-score-method">The score method</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#candidate-class-definition">Candidate class definition</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#candidate-initialization">Candidate initialization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#default-algorithms">Default algorithms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#custom-algorithms">Custom algorithms</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#the-fit-method">The fit() method</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#the-score-method">The score() method</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#candidate-initialization">Candidate initialization</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="parameters.html">Hyperparameter tuning</a></li>
 <li class="toctree-l1"><a class="reference internal" href="architecture.html">BAD architecture</a></li>
-<li class="toctree-l1"><a class="reference internal" href="contributions.html">Contributing to BAD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="citing.html">Citation policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 </ul>
 
             
@@ -165,10 +170,62 @@
 detection algorithm in the <strong>BAD</strong> framework.</p>
 <p>In practice, a Candidate is a Python module implementing an anomaly
 detection technique.</p>
-<p>The Candidate API defines the characteristics of a Candidate module.</p>
-<div class="section" id="the-score-method">
-<h2>The score method<a class="headerlink" href="#the-score-method" title="Permalink to this headline">¶</a></h2>
-<p>A Candidate must implement both the <strong>fit()</strong> and <strong>score()</strong> methods</p>
+<div class="section" id="default-algorithms">
+<h2>Default algorithms<a class="headerlink" href="#default-algorithms" title="Permalink to this headline">¶</a></h2>
+<p>The following table contains the default algorithm implementations available for <strong>BAD</strong>.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 7%" />
+<col style="width: 93%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Name</p></th>
+<th class="head"><p>Source</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>dummy</p></td>
+<td><p><a class="reference external" href="https://www.dbs.ifi.lmu.de/research/outlier-evaluation/DAMI/semantic/Annthyroid/">Abnormal thyroid conditions</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>fb</p></td>
+<td><p><a class="reference external" href="http://odds.cs.stonybrook.edu/forestcovercovertype-dataset/">Forest cover types</a></p></td>
+</tr>
+<tr class="row-even"><td><p>iforest</p></td>
+<td><p><a class="reference external" href="http://odds.cs.stonybrook.edu/glass-data/">Forensics glass samples</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>knn</p></td>
+<td><p><a class="reference external" href="https://www.dbs.ifi.lmu.de/research/outlier-evaluation/DAMI/literature/KDDCup99/">Intrusion detection data set</a></p></td>
+</tr>
+<tr class="row-even"><td><p>loci</p></td>
+<td><p><a class="reference external" href="https://www.dbs.ifi.lmu.de/research/outlier-evaluation/DAMI/literature/PenDigits/">Hand-written digits</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>lof</p></td>
+<td><p><a class="reference external" href="https://www.dbs.ifi.lmu.de/research/outlier-evaluation/DAMI/literature/Shuttle/">Space shuttle sensor reading</a></p></td>
+</tr>
+<tr class="row-even"><td><p>ocsvm</p></td>
+<td><p><a class="reference external" href="http://odds.cs.stonybrook.edu/wbc/">Breast cancer screening</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>partknn</p></td>
+<td><p><a class="reference external" href="http://odds.cs.stonybrook.edu/wine/">Wine chemical analysis</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="custom-algorithms">
+<h2>Custom algorithms<a class="headerlink" href="#custom-algorithms" title="Permalink to this headline">¶</a></h2>
+<p>To implement an algorithm to be used by the <strong>BAD</strong> framework you must implement a Python
+class, known as the <em>Candidate class</em>.</p>
+<p>The Candidate class must be the <em>first class</em> (in order) to be defined in
+the Candidate module.</p>
+<p>The Candidate API defines the characteristics of the Candidate class.
+In particular, a Candidate implementation must implement the following methods:</p>
+<ul class="simple">
+<li><p><strong>fit()</strong></p></li>
+<li><p><strong>score()</strong></p></li>
+<li><p><strong>__init__()</strong></p></li>
+</ul>
+<div class="section" id="the-fit-method">
+<h3>The fit() method<a class="headerlink" href="#the-fit-method" title="Permalink to this headline">¶</a></h3>
 <p>The <strong>fit()</strong> method must have the following signature:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">train_data</span><span class="p">):</span>
 
@@ -180,8 +237,14 @@ detection technique.</p>
 <p>The <strong>train_data</strong> parameter represents the training dataset. It is represented as a
 2-dimensional
 <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html">numpy array</a>
-of float with shape <em>N X D</em>.</p>
-<p>The <strong>fit()</strong> method returns the fitted Candidate.</p>
+of float with shape <em>N X D</em>.
+The <strong>fit()</strong> method returns the fitted Candidate.</p>
+<p>Even when the implemented algorithm does not require model fitting, e.g. stateless
+models, you must still provide a <strong>fit()</strong> method with the given signature returning
+the Candidate object instance.</p>
+</div>
+<div class="section" id="the-score-method">
+<h3>The score() method<a class="headerlink" href="#the-score-method" title="Permalink to this headline">¶</a></h3>
 <p>The <strong>score()</strong> method must have the following signature:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">):</span>
 
@@ -192,15 +255,8 @@ of float with shape <em>N X D</em>.</p>
 </div>
 <p>The <strong>element</strong> parameter represents a data element as a row vector.</p>
 </div>
-<div class="section" id="candidate-class-definition">
-<h2>Candidate class definition<a class="headerlink" href="#candidate-class-definition" title="Permalink to this headline">¶</a></h2>
-<p>The <strong>fit</strong> and <strong>score</strong> methods must be implemented as a Python class.
-This class is known as the <em>Candidate class</em>.</p>
-<p>The Candidate class must be the <em>first class</em> (in order) defined in
-the Candidate module.</p>
-</div>
 <div class="section" id="candidate-initialization">
-<h2>Candidate initialization<a class="headerlink" href="#candidate-initialization" title="Permalink to this headline">¶</a></h2>
+<h3>Candidate initialization<a class="headerlink" href="#candidate-initialization" title="Permalink to this headline">¶</a></h3>
 <p>Candidate initialization is performed using the <strong>__init__()</strong> method
 of the Candidate class.</p>
 <p>To support the <a class="reference internal" href="parameters.html#pages-parameters"><span class="std std-ref">BAD parameters API</span></a>, the
@@ -217,6 +273,7 @@ signature.</p>
 <p>The special key <em>seed</em> is always provided by the framework to be used
 as an RNG seed for replicable experiments. You can override the seed
 in the Candidate parameters file.</p>
+</div>
 </div>
 </div>
 

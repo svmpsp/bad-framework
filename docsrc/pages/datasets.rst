@@ -45,6 +45,6 @@ For example, you could contribute the file **my_data.arff** with the following c
    @ATTRIBUTE 'att2' real
    ...
 
-See :ref:`Contributing to BAD <pages/contributions>` for more information.
+See :ref:`Contributing to BAD <pages/contributing>` for more information.
 
 .. _ARFF: https://www.cs.waikato.ac.nz/ml/weka/arff.html
