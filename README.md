@@ -12,7 +12,7 @@ this installs the `bad` command-line interface.
 
 Example usage
 -------------
-Before running experiments you need to start the **BAD** server processes:
+Before running experiments, you need to start the **BAD** server processes:
 
 ```
 bad server-start
@@ -24,11 +24,11 @@ bad run -c lof -d shuttle
 ```
 this executes the famous **Local Outlier Factor (LOF)** algorithm on the **shuttle** dataset.
 
-By default, results are stored in the file `bad_out.csv`.
+By default, results are stored in the file `./bad_out.csv`.
 
 The output file contains execution times, hyperparameter settings and evaluation metrics for all executed experiments.
 
-This makes it easy to plot the results 
+The output file can be easily plotted with any graphing library.
 
 Please refer to the **[official documentation](https://passiv-me.github.io/bad-framework/)** for a complete command line reference.
 
