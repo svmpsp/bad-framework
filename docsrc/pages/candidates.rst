@@ -12,18 +12,18 @@ Default algorithms
 ------------------
 The following table contains the default algorithm implementations available for **BAD**.
 
-=========  =======
+=========  ===========================================================================================
  Name       Source
-=========  =======
- dummy      `Abnormal thyroid conditions <https://www.dbs.ifi.lmu.de/research/outlier-evaluation/DAMI/semantic/Annthyroid/>`_
- fb         `Forest cover types <http://odds.cs.stonybrook.edu/forestcovercovertype-dataset/>`_
- iforest    `Forensics glass samples <http://odds.cs.stonybrook.edu/glass-data/>`_
- knn        `Intrusion detection data set <https://www.dbs.ifi.lmu.de/research/outlier-evaluation/DAMI/literature/KDDCup99/>`_
- loci       `Hand-written digits <https://www.dbs.ifi.lmu.de/research/outlier-evaluation/DAMI/literature/PenDigits/>`_
- lof        `Space shuttle sensor reading <https://www.dbs.ifi.lmu.de/research/outlier-evaluation/DAMI/literature/Shuttle/>`_
- ocsvm      `Breast cancer screening <http://odds.cs.stonybrook.edu/wbc/>`_
- partknn    `Wine chemical analysis <http://odds.cs.stonybrook.edu/wine/>`_
-=========  =======
+=========  ===========================================================================================
+ dummy      Random anomaly detector
+ fb         `Feature bagging <https://dl.acm.org/doi/abs/10.1145/1081870.1081891>`_
+ iforest    `Isolation forest <https://ieeexplore.ieee.org/abstract/document/4781136>`_
+ knn        `K-nearest neighbor anomaly detector <https://dl.acm.org/doi/abs/10.1145/342009.335437>`_
+ loci       `Local correlation integral <https://ieeexplore.ieee.org/abstract/document/1260802>`_
+ lof        `Local outlier factor <https://dl.acm.org/doi/abs/10.1145/342009.335388>`_
+ ocsvm      `One-class SVM <https://www.mitpressjournals.org/doi/abs/10.1162/089976601750264965>`_
+ partknn    Partition-wise k-nearest neighbor
+=========  ===========================================================================================
 
 Custom algorithms
 -----------------
@@ -36,9 +36,32 @@ the Candidate module.
 The Candidate API defines the characteristics of the Candidate class.
 In particular, a Candidate implementation must implement the following methods:
 
+- **__init__()**
 - **fit()**
 - **score()**
-- **__init__()**
+
+Candidate initialization
+________________________
+Candidate initialization is performed using the **__init__()** method
+of the Candidate class.
+
+To support the :ref:`BAD parameters API <pages/parameters>`, the
+Candidate **__init__()** method must be implemented with the following
+signature.
+
+.. code-block:: python
+
+   def __init__(self, **kwargs):
+
+       # Extract parameters from kwargs ...
+
+The keys in the **kwargs** dict will match the keys defined in the
+*candidate_parameters.txt* file. For more details, see
+:ref:`Hyperparameter tuning <pages/parameters>`.
+
+The special key *seed* is always provided by the framework to be used
+as an RNG seed for replicable experiments. You can override the seed
+in the Candidate parameters file.
 
 The fit() method
 ________________
@@ -76,26 +99,3 @@ The **score()** method must have the following signature:
 
 
 The **element** parameter represents a data element as a row vector.
-
-Candidate initialization
-________________________
-Candidate initialization is performed using the **__init__()** method
-of the Candidate class.
-
-To support the :ref:`BAD parameters API <pages/parameters>`, the
-Candidate **__init__()** method must be implemented with the following
-signature.
-
-.. code-block:: python
-
-   def __init__(self, **kwargs):
-   
-       # Extract parameters from kwargs ...
-
-The keys in the **kwargs** dict will match the keys defined in the
-*candidate_parameters.txt* file. For more details, see
-:ref:`hyper-parameter tuning <pages/parameters>`.
-
-The special key *seed* is always provided by the framework to be used
-as an RNG seed for replicable experiments. You can override the seed
-in the Candidate parameters file.
