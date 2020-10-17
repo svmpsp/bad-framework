@@ -10,7 +10,7 @@ class KNN:
 
     Ramaswamy, Sridhar, Rajeev Rastogi, and Kyuseok Shim.
     "Efficient algorithms for mining outliers from large data sets."
-    ACM Sigmod Record. Vol. 29. No. 2. ACM, 2000.
+    ACM SIGMOD Record. Vol. 29. No. 2. ACM, 2000.
 
     Parameters:
     - k: (int) number of neighbors to consider (defaults to 10). Must
@@ -19,7 +19,12 @@ class KNN:
     """
 
     def __init__(self, **kwargs):
-        self.k = int(kwargs.get("k", 10))
+        param_k = int(kwargs.get("k", 10))
+        if param_k < 1:
+            raise ValueError(
+                "invalid parameter value. k must be positive: k={}".format(param_k)
+            )
+        self.k = param_k
         self._model = None
 
     def fit(self, train_data):

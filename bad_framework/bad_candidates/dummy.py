@@ -16,8 +16,17 @@ class Dummy:
     """
 
     def __init__(self, **kwargs):
-        self.p = float(kwargs.get("p", 0.5))
-        np.random.seed(int(kwargs["seed"]))
+        param_p = float(kwargs.get("p", 0.5))
+        if not 0.0 <= param_p <= 1.0:
+            raise ValueError(
+                "invalid parameter value. p must be between 0.0 and 1.0: p={}".format(
+                    param_p
+                )
+            )
+
+        self.p = param_p
+        self.seed = int(kwargs.get("seed", 1234))
+        np.random.seed(self.seed)
 
     def fit(self, train_data):
         """No fitting required.

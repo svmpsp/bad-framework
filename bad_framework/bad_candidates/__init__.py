@@ -5,14 +5,14 @@ All rights reserved.
 import os
 
 CANDIDATE_FILES = {
-    "dummy": "Dummy.py",
-    "fb": "FeatureBagging.py",
-    "iforest": "IForest.py",
-    "knn": "KNN.py",
-    "loci": "LOCI.py",
-    "lof": "LOF.py",
-    "ocsvm": "OCSVM.py",
-    "partknn": "PartKNN.py",
+    "dummy": "dummy.py",
+    "fb": "feature_bagging.py",
+    "iforest": "iforest.py",
+    "knn": "knn.py",
+    "loci": "loci.py",
+    "lof": "lof.py",
+    "ocsvm": "ocsvm.py",
+    "partknn": "partknn.py",
 }
 
 CANDIDATE_REQUIREMENTS = {

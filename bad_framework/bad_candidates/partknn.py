@@ -26,27 +26,27 @@ def _score_partition(k, partition_data):
 
 
 class PartKNN:
-    """
-    TODO:
-     - fix life!
-    """
-
     def __init__(self, **kwargs):
-        self.k = int(kwargs.get("k", 10))
-        self.partitions_num = int(kwargs.get("partitions_num", 10))
-        self.seed = int(kwargs["seed"])
+        param_k = int(kwargs.get("k", 10))
+        param_partitions_num = int(kwargs.get("partitions_num", 10))
+
+        if param_k < 1:
+            raise ValueError(
+                "invalid parameter value. k must be positive: k={}".format(param_k)
+            )
+        if param_partitions_num < 1:
+            raise ValueError(
+                "invalid parameter value. "
+                "partitions_num must be positive: partitions_num={}".format(
+                    param_partitions_num
+                )
+            )
+        self.k = param_k
+        self.partitions_num = param_partitions_num
         self._model = None
 
     def fit(self, train_data):
-        """Fits and compute score partition wise.
-
-        Save scores for score method.
-
-        TODO:
-         - add partition number to train_matrix
-         - create RDD with partition number as partitioning
-         - compute KNN partition-wise
-         - collect scores and create the model.
+        """Fits and compute score partition wise. Save scores for score method.
 
         :param train_data:
         :return:
