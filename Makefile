@@ -16,7 +16,7 @@ DOC_SOURCES = $(shell find docsrc | grep -v '.*_.*')
 
 all: package
 
-### - venv: creates the virtualenvironment for the project.
+### - venv: creates the virtual environment for the project.
 venv: .python-version
 .python-version: requirements.txt setup.py
 	@echo ">>> Creating project development venv..."
@@ -37,7 +37,7 @@ docs: $(DOC_SOURCES) .python-version
 
 ### - test: runs unit and integration tests.
 test: .pytest_report
-.pytest_report: $(TEST_SOURCES) $(SOURCES) .python-version
+.pytest_report: $(TEST_SOURCES) $(SOURCES) .python-version pytest.ini
 	@echo ">>> Running tests..."
 	-rm -f .pytest_report
 	-rm -f .coverage

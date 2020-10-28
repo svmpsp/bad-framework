@@ -2,92 +2,108 @@
 
 All rights reserved.
 """
-from tempfile import TemporaryDirectory
-import logging
 import os
 import re
 import shutil
+from tempfile import TemporaryDirectory
 
-from .adt import conditional_casting
 import bad_framework
-
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)5s - %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
-)
-log = logging.getLogger("bad.client")
-
-
-def get_candidate_name(candidate_path):
-    """
-    TODO:
-     - add error checking (e.g. candidate_path is empty)
-
-    :param candidate_path:
-    :return:
-    """
-    # Matches a python class definition and captures the class name.
-    class_name_re = re.compile(r"^class[\s]+(\w+)[(:]")
-    candidate_name = None
-    with open(candidate_path, "r") as candidate_file:
-        for line in candidate_file.readlines():
-            match = class_name_re.match(line)
-            if match:
-                # The first capture group is the class name
-                candidate_name = str(match[1])
-                break
-    return candidate_name
+from bad_framework.bad_utils.adt import conditional_casting
 
 
 def get_candidate_filename(home_dir, suite_id):
     """Returns a suite-unique filename where to store a local candidate module.
 
-    TODO: refactor, maybe get_local_candidate_filename?
-
-    :param home_dir:
-    :param suite_id:
-    :return:
+    :param home_dir: (string) filename of the server home directory.
+    :param suite_id: (string) suite identifier.
+    :return: (string) filename of the candidate.
     """
     base_path = os.path.join(home_dir, suite_id)
     return os.path.join(base_path, "candidate.py")
 
 
+def get_candidate_name(candidate_path):
+    """Parses the candidate file and returns the name of the candidate class.
+
+    :param candidate_path: (string) filename of the candidate file
+    :return: (string) the candidate class name
+    """
+    if not candidate_path:
+        raise ValueError("invalid candidate path {}".format(candidate_path))
+
+    # Matches a python class definition and captures the class name.
+    class_name_re = re.compile(r"^class[\s]+(\w+)[(:]")
+    with open(candidate_path, "r") as candidate_file:
+        for line in candidate_file.readlines():
+            match = class_name_re.match(line)
+            if match:
+                # The first capture group is the candidate class name
+                return str(match[1])
+    raise ValueError("invalid candidate file {}".format(candidate_path))
+
+
 def parse_param_line(line):
-    """Parse a line of text specifying a parameter and returns the
+    """Parses a line of text specifying a parameter and returns the
     parsed fields.
 
     :param line: (string) line of text to parse
     :return: (list[string]) parameter specification fields.
     """
-    return re.split(r"\s+", line.strip())
+    if line:
+        return re.split(r"\s+", line.strip())
+    return []
 
 
 def parse_value_parameter(fields):
+    if len(fields) != 2:
+        raise ValueError("invalid value parameter fields")
     param_name = fields[0]
     value = conditional_casting(fields[1])
     return param_name, value
 
 
 def parse_range_parameter(fields):
+    """
+
+    >>> parse_range_parameter(["param_name", "1.", "10.", "1."])
+    ('param_name', 1.0, 10.0, 1.0)
+    >>> parse_range_parameter(["param_name", "1", "10", "1"])
+    ('param_name', 1, 10, 1)
+    >>> parse_range_parameter(["param_name", "a", "b", "c"])
+    Traceback (most recent call last):
+        ...
+    ValueError: invalid parameter range ...
+    >>> parse_range_parameter(["param_name", "10.", "1.", "1."])
+    Traceback (most recent call last):
+        ...
+    ValueError: invalid parameter range ...
+    >>> parse_range_parameter(["param_name", "10", "1", "1"])
+    Traceback (most recent call last):
+        ...
+    ValueError: invalid parameter range ...
+
+    :param fields:
+    :return:
+    """
+    if len(fields) != 4:
+        raise ValueError("invalid range parameter fields")
     param_name = fields[0]
     start = conditional_casting(fields[1])
     end = conditional_casting(fields[2])
     step = conditional_casting(fields[3])
     param_type = start.__class__.__name__
-    if type(start) == type(end) == type(step) and (
-        param_type == "float" or param_type == "int"
-    ):
-        return param_name, start, end, step
-    else:
-        raise ValueError(
-            "invalid parameter range for {name}: <{start}, {end}, {step}> ".format(
-                name=param_name,
-                start=start,
-                end=end,
-                step=step,
-            )
+    if type(start) == type(end) == type(step):
+        if param_type == "float" or param_type == "int":
+            if end >= start:
+                return param_name, start, end, step
+    raise ValueError(
+        "invalid parameter range for {name}: <{start}, {end}, {step}> ".format(
+            name=param_name,
+            start=start,
+            end=end,
+            step=step,
         )
+    )
 
 
 def parse_requirements(requirements_filename):
@@ -188,7 +204,6 @@ def copy_files_to_bad_directory(dest_dir):
 
     with TemporaryDirectory() as temp_dir:
         dest_dir_path = os.path.join(temp_dir, "buffer_dir")
-        log.debug("Copying all contents from %s to %s", src_dir_path, dest_dir_path)
         shutil.copytree(src_dir_path, dest_dir_path)
 
         # Copy all contents of the temporary directory to the current directory
