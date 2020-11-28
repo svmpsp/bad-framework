@@ -22,6 +22,14 @@ log = logging.getLogger("bad.client")
 
 
 def _add_default_parameters(parameters_list, config):
+    """
+
+    >>> params = [("a", 1), ("b", 2)]
+    >>> config = {"bad.experiment.seed": 42, "bad.experiment.trainset_size": 1.0}
+    >>> _add_default_parameters(params, config)
+    [('a', 1), ('b', 2), ('seed', 42), ('trainset_size', 1.0)]
+
+    """
     parameters_list.append(("seed", config["bad.experiment.seed"]))
     parameters_list.append(("trainset_size", config["bad.experiment.trainset_size"]))
     return parameters_list
@@ -86,10 +94,6 @@ def _create_suite(config):
 
 def _generate_suite_settings(config):
     """Generates JSON-encoded suite settings to be sent to the master.
-
-    TODO:
-     - add support for local data files.
-     - add support for remote candidate files.
 
     :param config:
     :return:
@@ -215,6 +219,14 @@ def _stop_server(config):
 def _validate_config(command, config):
     """Validates the config settings for a given command. Returns True if the config
     is valid, raises an exception otherwise.
+
+    >>> config = {"bad.workers": [("localhost", "1234")]}
+    >>> _validate_config("server-stop", config)
+
+    >>> _validate_config("server-stop", {})
+    Traceback (most recent call last):
+        ...
+    ValueError: parameter ...
 
     :param command: (string)
     :param config: (dict)

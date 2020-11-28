@@ -46,6 +46,13 @@ def parse_param_line(line):
     """Parses a line of text specifying a parameter and returns the
     parsed fields.
 
+    >>> parse_param_line("param_name  10")
+    ['param_name', '10']
+    >>> parse_param_line("")
+    []
+    >>> parse_param_line("param_name 1  10  1")
+    ['param_name', '1', '10', '1']
+
     :param line: (string) line of text to parse
     :return: (list[string]) parameter specification fields.
     """
@@ -55,6 +62,20 @@ def parse_param_line(line):
 
 
 def parse_value_parameter(fields):
+    """
+
+    >>> parse_value_parameter([])
+    Traceback (most recent call last):
+        ...
+    ValueError: invalid value parameter fields
+    >>> parse_value_parameter(["param_name", "10"])
+    ('param_name', 10)
+    >>> parse_value_parameter(["param_name", "string"])
+    ('param_name', 'string')
+    >>> parse_value_parameter(["param_name", "1.0"])
+    ('param_name', 1.0)
+
+    """
     if len(fields) != 2:
         raise ValueError("invalid value parameter fields")
     param_name = fields[0]
@@ -82,8 +103,6 @@ def parse_range_parameter(fields):
         ...
     ValueError: invalid parameter range ...
 
-    :param fields:
-    :return:
     """
     if len(fields) != 4:
         raise ValueError("invalid range parameter fields")
@@ -154,27 +173,6 @@ def save_file(content, path):
         os.makedirs(os.path.dirname(path))
     with open(path, "wb+") as file:
         file.write(content)
-
-
-def file_exists_with_content(path, expected_content):
-    """Checks that the file identified by path exists and that it contains
-    the given content.
-
-    :param path: (string) path to file to check.
-    :param expected_content: (bytes) bytes representing the expected content of the file.
-    :return: (bool) True if the file exists and has
-    the expected content, raises a ValueError otherwise.
-    """
-    if not os.path.exists(os.path.dirname(path)):
-        raise ValueError("file {} does not exist.".format(path))
-    with open(path, "rb") as file:
-        actual_content = file.read()
-        print("Actual content is:", actual_content)
-        if not actual_content == expected_content:
-            raise ValueError(
-                "file {} does not contain the expected content.".format(path)
-            )
-    return True
 
 
 def get_init_paths():

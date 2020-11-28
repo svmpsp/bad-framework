@@ -32,7 +32,13 @@ from bad_framework.bad_utils.files import (
     get_include_dir,
     save_file,
 )
-from .models import Candidate, Dataset, Experiment, Suite, Worker
+from bad_framework.bad_master.models import (
+    Candidate,
+    Dataset,
+    Experiment,
+    Suite,
+    Worker,
+)
 
 log = logging.getLogger("bad.server.master")
 

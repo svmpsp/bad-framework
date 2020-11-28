@@ -3,9 +3,9 @@ import pytest
 from bad_framework.bad_utils.files import (
     get_candidate_filename,
     get_candidate_name,
-    parse_param_line,
+    parse_parameters,
     parse_requirements,
-    parse_value_parameter,
+    save_file,
 )
 
 
@@ -69,28 +69,27 @@ def test_get_candidate_name_with_no_classes(tmp_path):
         get_candidate_name(candidate_file)
 
 
-def test_parse_param_line():
-    assert ["param_name", "10", "100", "10"] == parse_param_line(
-        "param_name  10  100  10"
+def test_parse_parameters(tmp_path):
+    parameters_file_contents = "\n".join(
+        [
+            "# This is a comment",
+            "value_parameter  10",
+            "range_parameter  1  10  1",
+        ]
     )
+    parameters_file = tmp_path / "requirements.txt"
+    parameters_file.write_text(parameters_file_contents)
 
+    expected_parameters = [
+        ("value_parameter", 10),
+        ("range_parameter", 1, 10, 1),
+    ]
 
-def test_parse_param_line_with_empty_line():
-    assert [] == parse_param_line("")
-
-
-def test_parse_value_parameter():
-    expected_output = ("param_name", 100)
-    assert expected_output == parse_value_parameter(["param_name", "100"])
-
-
-def test_parse_value_parameter_with_empty_fields():
-    with pytest.raises(ValueError):
-        parse_value_parameter([])
+    assert expected_parameters == parse_parameters(parameters_file)
 
 
 def test_parse_requirements(tmp_path):
-    dummy_requirements = "\n".join(
+    requirements_file_contents = "\n".join(
         [
             "# This is a comment",
             "versioned-requirement-with-spaces >= 1.2.3",
@@ -101,7 +100,7 @@ def test_parse_requirements(tmp_path):
         ]
     )
     requirements_file = tmp_path / "requirements.txt"
-    requirements_file.write_text(dummy_requirements)
+    requirements_file.write_text(requirements_file_contents)
     expected_requirements = [
         "naked-requirement",
         "requirement-with-comment",
@@ -109,3 +108,12 @@ def test_parse_requirements(tmp_path):
         "versioned-requirement==4.5.6",
     ]
     assert expected_requirements == parse_requirements(requirements_file)
+
+
+def test_save_file(tmp_path):
+    dummy_content = "hello world".encode("utf-8")
+    test_file = tmp_path / "dummy_file"
+
+    save_file(dummy_content, test_file)
+
+    assert dummy_content == test_file.read_bytes()
