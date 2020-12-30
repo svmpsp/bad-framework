@@ -1,16 +1,16 @@
 #!/usr/bin/env make
 
-PYTHON_VERSION ?= 3.7.5
-PACKAGE_NAME ?= bad_framework
+PYTHON_VERSION := 3.7.5
+PACKAGE_NAME := bad_framework
 VENV_NAME := $(PACKAGE_NAME)-$(PYTHON_VERSION)
 
-SRC_DIR ?= bad_framework
-TEST_DIR ?= tests
-INSTALL_DIR ?= install
+SRC_DIR := bad_framework
+TEST_DIR := tests
+INSTALL_DIR := install
 
-SOURCES ?= $(shell find $(PACKAGE_NAME))
-TEST_SOURCES ?= pytest.ini $(shell find tests)
-DOC_SOURCES = $(shell find docsrc | grep -v '.*_.*')
+SOURCES := $(shell find $(PACKAGE_NAME))
+TEST_SOURCES := pytest.ini $(shell find tests)
+DOC_SOURCES := $(shell find docsrc | grep -v '.*_.*')
 
 .PHONY: clean help
 
