@@ -36,6 +36,6 @@ Please refer to the **[official documentation](https://passiv-me.github.io/bad-f
 
 ---
 
-Copyright © 2020 Sivam Pasupathipillai - <s.pasupathipillai@unitn.it>.
+Copyright © 2020 Sivam Pasupathipillai - <sivam.pasupathipillai@gmail.com>.
 
 All rights reserved.
