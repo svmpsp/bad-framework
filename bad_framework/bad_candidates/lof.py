@@ -37,4 +37,4 @@ class LOF:
         if not self._model:
             raise ValueError("invalid state. The model has not been trained.")
         element = element.reshape(1, -1)
-        return - self._model.decision_function(element)[0]
+        return -self._model.decision_function(element)[0]
