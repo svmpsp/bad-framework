@@ -23,7 +23,7 @@ setup(
     name="bad-framework",
     version=bad_framework.__version__,
     author="Sivam Pasupathipillai",
-    author_email="s.pasupathipillai@unitn.it",
+    author_email="sivam.pasupathipillai@gmail.com",
     description="Benchmarking Anomaly Detection (BAD) framework.",
     long_description=long_description,
     long_description_content_type="text/markdown",
