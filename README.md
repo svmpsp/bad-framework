@@ -1,8 +1,6 @@
 # BAD - Benchmarking Anomaly Detection
 The **BAD** framework is a distributed framework for benchmarking unsupervised anomaly detection algorithms.
 
-For details, please refer to the **[official documentation](https://passiv-me.github.io/bad-framework/)**.
-
 Installation
 ------------
 **BAD** can be easily installed via `pip` with the command:
@@ -11,6 +9,23 @@ Installation
 pip install bad-framework
 ```
 this installs the `bad` command-line interface.
+
+Development
+-----------
+Development is guided via `make`, run:
+```bash
+make help
+```
+for a list of available targets.
+
+Documentation
+-------------
+
+Sphinx documentation can be built by running:
+```bash
+make docs
+```
+The documentation index can be found at `docs/index.html`
 
 Example usage
 -------------

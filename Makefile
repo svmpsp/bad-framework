@@ -1,8 +1,6 @@
 #!/usr/bin/env make
 
-PYTHON_VERSION := 3.7.13
 PACKAGE_NAME := bad_framework
-VENV_NAME := $(PACKAGE_NAME)-$(PYTHON_VERSION)
 
 SRC_DIR := bad_framework
 TEST_DIR := tests
@@ -85,7 +83,6 @@ clean:
 	-rm -rf $(INSTALL_DIR)
 	-rm -rf docsrc/_build
 	-rm -rf dist
-	-pyenv uninstall -f $(VENV_NAME)
 	@echo "<<< Done."
 
 ### - help: displays this message.
