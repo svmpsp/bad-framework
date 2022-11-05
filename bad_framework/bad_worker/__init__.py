@@ -1,4 +1,4 @@
-"""Copyright (C) 2020 Sivam Pasupathipillai <s.pasupathipillai@unitn.it>.
+"""Copyright (C) 2020 Sivam Pasupathipillai <sivam.pasupathipillai@gmail.com>.
 
 All rights reserved.
 """
@@ -35,7 +35,7 @@ def start_bad_worker(hostname, port, debug=False):
         "port": port,
     }
     subprocess.call(
-        ["{flag} source {script} {hostname} {port} > /dev/null".format(**params)],
+        ["{flag} . {script} {hostname} {port} > /dev/null".format(**params)],
         shell=True,
     )
 
@@ -47,6 +47,6 @@ def stop_bad_worker(hostname):
         "hostname": hostname,
     }
     subprocess.call(
-        ["source {script} {hostname} > /dev/null".format(**params)],
+        [". {script} {hostname} > /dev/null".format(**params)],
         shell=True,
     )

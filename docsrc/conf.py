@@ -22,8 +22,7 @@ import bad_framework
 
 # The full version, including alpha/beta/rc tags
 release = bad_framework.__version__
-
-project = "bad-framework {}".format(release)
+project = f"bad-framework {release}"
 copyright = str(datetime.datetime.now().year) + ", Sivam Pasupathipillai"
 author = "Sivam Pasupathipillai"
 

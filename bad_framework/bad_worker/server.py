@@ -1,4 +1,4 @@
-"""Copyright (C) 2020 Sivam Pasupathipillai <s.pasupathipillai@unitn.it>.
+"""Copyright (C) 2020 Sivam Pasupathipillai <sivam.pasupathipillai@gmail.com>.
 
 All rights reserved.
 """
@@ -43,9 +43,7 @@ class BADWorkerServer:
             worker_port=port,
             worker_home=home_dir,
         )
-        self._server = tornado.httpserver.HTTPServer(
-            self._app, max_buffer_size=524288000
-        )
+        self._server = tornado.httpserver.HTTPServer(self._app, max_buffer_size=524288000)
 
     def start(self):
         log.info(">>> Starting BAD worker on port %d", self._port)

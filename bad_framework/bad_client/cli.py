@@ -1,4 +1,4 @@
-"""Copyright (C) 2020 Sivam Pasupathipillai <s.pasupathipillai@unitn.it>.
+"""Copyright (C) 2020 Sivam Pasupathipillai <sivam.pasupathipillai@gmail.com>.
 
 All rights reserved.
 """
@@ -36,10 +36,9 @@ def _add_default_parameters(parameters_list, config):
 
 
 def _create_suite(config):
-    """Hello world!
+    """Create a suite of experiments corresponding to
+    the provided config.
 
-    TODO:
-     - documentation
     :param config:
     :return:
     """
@@ -191,8 +190,9 @@ def _start_server(config):
     master_port = config["bad.master.port"]
     debug = config["bad.debug"]
 
-    log.info(">>> Starting BAD master at localhost on port 3290")
+    log.info(">>> Starting BAD master at localhost on port %s", master_port)
     start_bad_master(master_port, debug)
+    log.info(">>> BAD master available at http://localhost:%s", master_port)
     log.info("<<< Done.")
 
     workers_path = config["bad.workers"]

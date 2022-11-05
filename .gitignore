@@ -1,14 +1,9 @@
 *~
 .coverage
-.idea
 .python-version
-.pytest_report
-.pypi_report
+.build_*
 __pycache__
-bad_framework.egg-info
 build
 dist
 docs/.buildinfo
 docsrc/_build
-staging
-venv-bad-framework

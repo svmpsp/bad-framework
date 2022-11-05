@@ -1,6 +1,6 @@
 #!/usr/bin/env make
 
-PYTHON_VERSION := 3.7.5
+PYTHON_VERSION := 3.7.13
 PACKAGE_NAME := bad_framework
 VENV_NAME := $(PACKAGE_NAME)-$(PYTHON_VERSION)
 
@@ -8,90 +8,88 @@ SRC_DIR := bad_framework
 TEST_DIR := tests
 INSTALL_DIR := install
 
-SOURCES := $(shell find $(PACKAGE_NAME))
-TEST_SOURCES := pytest.ini $(shell find tests)
+CONFIG_FILES := pyproject.toml docsrc/conf.py
+SOURCES := $(shell find $(PACKAGE_NAME) -name *.py)
+TEST_SOURCES := $(shell find tests -name *.py)
 DOC_SOURCES := $(shell find docsrc | grep -v '.*_.*')
+BUILD_SOURCES := $(CONFIG_FILES) $(SOURCES) $(TEST_SOURCES)
 
-.PHONY: clean help
+POETRY_CMD := poetry run
 
-all: package
-
-### - venv: creates the virtual environment for the project.
-venv: .python-version
-.python-version: requirements.txt setup.py
-	@echo ">>> Creating project development venv..."
-	-pyenv uninstall -f $(VENV_NAME)
-	pyenv virtualenv $(PYTHON_VERSION) $(VENV_NAME)
-	pyenv local $(VENV_NAME)
-	pip install -U pip wheel setuptools
-	pip install -r requirements.txt
-	pip install -e .
-	@echo "<<< Done."
+all: package docs
 
 ### - docs: builds the documentation.
 docs: $(DOC_SOURCES) .python-version
 	@echo ">>> Creating project documentation..."
-	$(MAKE) -C docsrc html
+	$(POETRY_CMD) $(MAKE) -C docsrc html
 	cp -a ./docsrc/_build/html/. ./docs
 	@echo "<<< Done"
 
-### - test: runs unit and integration tests.
-test: .pytest_report
-.pytest_report: $(TEST_SOURCES) $(SOURCES) .python-version pytest.ini
-	@echo ">>> Running tests..."
-	-rm -f .pytest_report
+format: .build_format_report
+.build_format_report: $(BUILD_SOURCES)
+	@echo ">>> Formatting Python code..."
+	-rm -f $@
 	-rm -f .coverage
-	pytest && (echo "All is well!" > .pytest_report)
+	$(POETRY_CMD) black . && (echo "All is well!" > $@)
+	@echo "<<< Done."
+	
+
+### - test: runs unit and integration tests.
+test: .build_pytest_report
+.build_pytest_report: $(BUILD_SOURCES) .build_format_report
+	@echo ">>> Running tests..."
+	-rm -f $@
+	-rm -f .coverage
+	$(POETRY_CMD) pytest && (echo "All is well!" > $@)
 	@echo "<<< Done."
 
 ### - package: packages the project for distribution via PyPI.
 package: dist
-dist: .python-version .pytest_report docs
+dist: .build_pytest_report
 	@echo ">>> Packaging BAD client..."
-	python3 setup.py sdist bdist_wheel
+	poetry build
 	@echo "<<< Done."
 
 ### - debug: creates a test installation for debugging purposes.
-debug: $(SRC_DIR) .pytest_report
+.PHONY: debug
+debug: $(BUILD_SOURCES) $(SRC_DIR) .build_pytest_report
 	@echo ">>> Creating installation directory..."
-	[[ -d $(INSTALL_DIR) ]] || mkdir $(INSTALL_DIR)
+	test -d $(INSTALL_DIR) || mkdir $(INSTALL_DIR)
 	@echo ">>> Starting debug session..."
-	pip install -e .
-	@cd $(INSTALL_DIR) && bash
+	@cd $(INSTALL_DIR) && poetry shell
 	rm -rf $(INSTALL_DIR)
 	@echo "<<< Done."
 
 ### - push-test: pushes the package to Test PyPI.
-push-test: .pypi_report
-.pypi_report: .python-version .pytest_report dist
+push-test: .build_pypi_report
+.build_pypi_report: .build_pytest_report dist
 	@echo ">>> Pushing to Test PyPI..."
-	-rm -f .pipy_report
-	twine check dist/* && twine upload --repository testpypi dist/* && (echo "Push test was good!" > .pypi_report)
+	-rm -f $@
+	twine check dist/* && twine upload --repository testpypi dist/* && \
+	  (echo "Push test was good!" > $@)
 	@echo "<<< Done."
 
 ### - push: pushes the package to PyPI.
-push: .pypi_report
+push: .build_pypi_report
 	@echo ">>> Pushing to PyPI..."
 	twine check dist/* && twine upload dist/*
 	@echo "<<< Done."
 
 ### - clean: cleans project directory.
+.PHONY: clean
 clean:
 	@echo ">>> Cleaning project directory..."
 	-rm -f ./*~  # Removes Emacs backup files
 	-rm -f .coverage
-	-rm -f .pytest_report
-	-rm -f .pypi_report
-	-rm -f .python-version
+	-rm -f .build_*
 	-rm -rf $(INSTALL_DIR)
-	-rm -rf build
 	-rm -rf docsrc/_build
-	-rm -rf $(PACKAGE_NAME).egg-info
 	-rm -rf dist
 	-pyenv uninstall -f $(VENV_NAME)
 	@echo "<<< Done."
 
 ### - help: displays this message.
+.PHONY: help
 help:
 	@echo "This project's Makefile supports the following targets:"
 	@grep '[#]##' Makefile | sed 's/[#]##//g'

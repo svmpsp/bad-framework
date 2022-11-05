@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Copyright (C) 2020 Sivam Pasupathipillai <s.pasupathipillai@unitn.it>.
+# Copyright (C) 2020 Sivam Pasupathipillai <sivam.pasupathipillai@gmail.com>.
 # All rights reserved.
 
 if [ "$#" -ne 2 ]; then
@@ -36,14 +36,14 @@ if [ "$BAD_DEBUG" = true ]; then
 
   ssh -qT "$BAD_WORKER_HOST" <<REMOTE_SCRIPT
   virtualenv "$VENV_DIR"
-  source "$VENV_DIR/bin/activate"
+  . "$VENV_DIR/bin/activate"
   pip install --upgrade pip
   pip install --upgrade "$BAD_PACKAGE"
 REMOTE_SCRIPT
 
   echo "Starting BAD worker..."
   ssh -qT "$BAD_WORKER_HOST" <<REMOTE_SCRIPT
-  source "$VENV_DIR/bin/activate"
+  . "$VENV_DIR/bin/activate"
   BAD_WORKER_LOG="$LOGS_DIR/bad-worker_$BAD_WORKER_PORT.log"
   echo Logging to \$BAD_WORKER_LOG
   nohup python3 -m bad_framework.bad_worker.server \
@@ -70,7 +70,7 @@ else
 
   ssh -qT "$BAD_WORKER_HOST" <<REMOTE_SCRIPT
   virtualenv  "$VENV_DIR"
-  source "$VENV_DIR/bin/activate"
+  . "$VENV_DIR/bin/activate"
   pip install --upgrade pip
   pip install --upgrade bad-framework
 REMOTE_SCRIPT
@@ -78,7 +78,7 @@ REMOTE_SCRIPT
   echo "Starting BAD worker..."
 
   ssh -qT "$BAD_WORKER_HOST" <<REMOTE_SCRIPT
-  source "$VENV_DIR/bin/activate"
+  . "$VENV_DIR/bin/activate"
   BAD_WORKER_LOG="$LOGS_DIR/bad-worker_$BAD_WORKER_PORT.log"
   echo Logging to \$BAD_WORKER_LOG
   nohup python3 -m bad_framework.bad_worker.server \

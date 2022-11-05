@@ -1,5 +1,5 @@
-#!/usr/bin/env bash
-# Copyright (C) 2020 Sivam Pasupathipillai <s.pasupathipillai@unitn.it>.
+#!/usr/bin/env sh
+# Copyright (C) 2020 Sivam Pasupathipillai <sivam.pasupathipillai@gmail.com>.
 # All rights reserved.
 
 if [ ! "$#" -eq 1 ]; then
@@ -9,7 +9,7 @@ fi
 
 function check_bad_master {
   # Checks if the BAD master has already been started
-  BAD_MASTER_PIDS="$( ps aux | grep '[b]ad_framework.bad_master.server' | awk '{ print $2; }' )"
+  BAD_MASTER_PIDS="$(ps aux | grep '[b]ad_framework.bad_master.server' | awk '{ print $2; }')"
   if [ ! -z "$BAD_MASTER_PIDS" ]; then
     echo "BAD master already started. Nothing to do."
     exit 1

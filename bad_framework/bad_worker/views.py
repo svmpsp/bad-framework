@@ -1,4 +1,4 @@
-"""Copyright (C) 2020 Sivam Pasupathipillai <s.pasupathipillai@unitn.it>.
+"""Copyright (C) 2020 Sivam Pasupathipillai <sivam.pasupathipillai@gmail.com>.
 
 All rights reserved.
 """
@@ -113,8 +113,7 @@ class SetupHandler(BaseWorkerHandler):
         """
         log.info("Downloading datasets: %r", datasets)
         data_urls = [
-            "dataset/{dataset_name}/".format(dataset_name=dataset)
-            for dataset in datasets
+            "dataset/{dataset_name}/".format(dataset_name=dataset) for dataset in datasets
         ]
         data_paths = [
             "{base_path}/datasets/{dataset_name}.arff".format(
