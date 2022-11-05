@@ -1,4 +1,4 @@
-"""Copyright (C) 2020 Sivam Pasupathipillai <s.pasupathipillai@unitn.it>.
+"""Copyright (C) 2020 Sivam Pasupathipillai <sivam.pasupathipillai@gmail.com>.
 
 All rights reserved.
 
@@ -555,9 +555,7 @@ class SuiteHandler(BaseMasterHandler):
             workers_list = message["workers"]
             if not Worker.get_all():
                 Worker.setup(workers_list, master_address)
-            workers = list(
-                Worker.get_all()  # this returns a non-subscriptable set-like
-            )
+            workers = list(Worker.get_all())  # this returns a non-subscriptable set-like
 
             candidate = self._get_candidate(suite.id, message)
 
@@ -599,9 +597,7 @@ class SuiteHandler(BaseMasterHandler):
             loader=PackageLoader("bad_framework.bad_master", "templates")
         )
         template = jinja2_env.get_template("suite_details.html")
-        rendered_template = template.render(
-            candidate=candidate, experiments=experiments
-        )
+        rendered_template = template.render(candidate=candidate, experiments=experiments)
         self.set_header("Content-type", "text/html")
         self.write(rendered_template.encode())
 

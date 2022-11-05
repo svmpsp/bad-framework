@@ -9,9 +9,7 @@ from bad_framework.bad_utils.adt import CandidateSpec, DataSpec
 def test_load_candidate_spec_with_local_candidate(tmp_path):
     candidate_file = tmp_path / "candidate.py"
     candidate_file.write_text("dummy_content")
-    assert CandidateSpec("local", candidate_file) == _load_candidate_spec(
-        candidate_file
-    )
+    assert CandidateSpec("local", candidate_file) == _load_candidate_spec(candidate_file)
 
 
 def test_load_candidate_spec_with_remote_candidate():

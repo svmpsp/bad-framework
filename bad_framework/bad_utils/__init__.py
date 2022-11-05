@@ -1,4 +1,4 @@
-"""Copyright (C) 2020 Sivam Pasupathipillai <s.pasupathipillai@unitn.it>.
+"""Copyright (C) 2020 Sivam Pasupathipillai <sivam.pasupathipillai@gmail.com>.
 
 All rights reserved.
 """
@@ -73,9 +73,7 @@ def get_parameter_string(parameters):
     >>> get_parameter_string({})
     ''
     """
-    return ";".join(
-        "{key}={value}".format(key=k, value=v) for k, v in parameters.items()
-    )
+    return ";".join("{key}={value}".format(key=k, value=v) for k, v in parameters.items())
 
 
 def init_worker_environments(workers, suite_id, candidate_id, datasets):

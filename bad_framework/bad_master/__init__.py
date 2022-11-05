@@ -1,4 +1,4 @@
-"""Copyright (C) 2020 Sivam Pasupathipillai <s.pasupathipillai@unitn.it>.
+"""Copyright (C) 2020 Sivam Pasupathipillai <sivam.pasupathipillai@gmail.com>.
 
 All rights reserved.
 """
@@ -25,7 +25,7 @@ def start_bad_master(port, debug=False):
         "port": port,
     }
     subprocess.call(
-        ["{flag} source {script} {port} > /dev/null".format(**params)],
+        ["{flag} . {script} {port} > /dev/null".format(**params)],
         shell=True,
     )
 
@@ -35,7 +35,7 @@ def stop_bad_master():
     package_bin_dir = "{include_dir}/bin".format(include_dir=get_include_dir())
     subprocess.call(
         [
-            "source {script} > /dev/null".format(
+            ". {script} > /dev/null".format(
                 script=os.path.join(package_bin_dir, "stop_master.sh")
             )
         ],

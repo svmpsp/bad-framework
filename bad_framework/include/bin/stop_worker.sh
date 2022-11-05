@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Copyright (C) 2020 Sivam Pasupathipillai <s.pasupathipillai@unitn.it>.
+# Copyright (C) 2020 Sivam Pasupathipillai <sivam.pasupathipillai@gmail.com>.
 # All rights reserved.
 
 if [ ! "$#" -eq 1 ]; then
